@@ -1,0 +1,62 @@
+name: Generate ERD (Django SQLite)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  erd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz graphviz-dev pkg-config
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pygraphviz --config-settings="--global-option=build_ext" --config-settings="--global-option=-I/usr/include/graphviz" --config-settings="--global-option=-L/usr/lib/graphviz"
+          pip install eralchemy2
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate --noinput
+
+      - name: Generate ER diagram
+        run: |
+          eralchemy2 -i sqlite:///db.sqlite3 -o erd.png
+
+      - name: Commit and push ERD
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add erd.png
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update ERD diagram [skip ci]"
+            git push
+          fi
+
+      - name: Upload ERD as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: erd-diagram
+          path: erd.png
+          retention-days: 30
