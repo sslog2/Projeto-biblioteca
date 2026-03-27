@@ -1,0 +1,224 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap");
+
+:root {
+  --background: #f5f0e8;
+  --background-lighter: #faf7f2;
+  --card: #ffffff;
+  --marrom: #1a1208;
+  --bege: #7a6e5f;
+  --accent: #c0392b;
+  --border: #e0d8cc;
+  --shadow: 0 2px 16px rgba(26, 18, 8, 0.08);
+  --radius: 4px;
+  --p: 20px;
+  --serif: "EB Garamond", serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--background);
+  color: var(--marrom);
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: var(--marrom);
+  color: var(--background);
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 32px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sidebar-logo h1 {
+  font-family: var(--serif);
+  font-size: 22px;
+}
+
+.nav-item {
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  gap: 10px;
+}
+.nav-item.active {
+  background: rgba(192, 57, 43, 0.15);
+  border-left: 3px solid var(--accent);
+}
+
+/* Main */
+.main {
+  margin-left: 240px;
+  flex: 1;
+}
+.topbar {
+  background: var(--background-lighter);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--p);
+  padding: var(--p);
+}
+
+.stat-card,
+.card {
+  background: var(--card);
+  padding: var(--p);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.page {
+  display: none;
+  padding: var(--p);
+}
+.page.active {
+  display: block;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.card-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title {
+  font-family: var(--serif);
+  font-size: 16px;
+}
+.section-meta {
+  font-size: 12px;
+  color: var(--bege);
+}
+
+/* Livros e Listas */
+.book-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.book-item:last-child {
+  border-bottom: none;
+}
+
+.book-cover {
+  width: 36px;
+  height: 50px;
+  border-radius: 2px;
+  color: white;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-info {
+  flex: 1;
+}
+.book-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+.book-author {
+  font-size: 12px;
+  color: var(--bege);
+  margin-top: 2px;
+}
+
+/* Badges e Avatares */
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.badge-new,
+.badge-ok {
+  background: #e8f5e9;
+  color: #2c5f2e;
+}
+.badge-out {
+  background: #fdecea;
+  color: var(--accent);
+}
+.badge-warn {
+  background: #fff8e1;
+  color: #b8860b;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--marrom);
+  color: var(--background);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 12px 22px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--bege);
+  background: var(--background-lighter);
+}
+td {
+  font-size: 14px;
+}
+tr:last-child td {
+  border-bottom: none;
+}
