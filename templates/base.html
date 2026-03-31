@@ -1,0 +1,69 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biblioteca Altus - Sistema de Gestão</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://www.nerdfonts.com/assets/css/nerd-fonts.css" />
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h1>Biblioteca Altus</h1>
+        <span>Sistema de Gestão</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Painel</div>
+        <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <span class="icon"></span> Visão Geral
+        </a>
+
+        <div class="nav-section-label">Catálogo</div>
+        <a href="{% url 'feed' %}" class="nav-item {% if request.resolver_match.url_name == 'feed' %}active{% endif %}">
+          <span class="icon"></span> Feed de Novidades
+        </a>
+        <a href="{% url 'ranking' %}" class="nav-item {% if request.resolver_match.url_name == 'ranking' %}active{% endif %}">
+          <span class="icon">󰨳</span> Ranking Semanal
+        </a>
+        <a href="{% url 'livros' %}" class="nav-item {% if request.resolver_match.url_name == 'livros' %}active{% endif %}">
+          <span class="icon"></span> Cadastro de Livros
+        </a>
+
+        <div class="nav-section-label">Gestão</div>
+        <a href="{% url 'editoras' %}" class="nav-item {% if request.resolver_match.url_name == 'editoras' %}active{% endif %}">
+          <span class="icon"></span> Editoras
+        </a>
+        <a href="{% url 'membros' %}" class="nav-item {% if request.resolver_match.url_name == 'membros' %}active{% endif %}">
+          <span class="icon"></span> Membros
+        </a>
+        <a href="{% url 'multa' %}" class="nav-item {% if request.resolver_match.url_name == 'multa' %}active{% endif %}">
+          <span class="icon">⊘</span> Calculador de Multa
+        </a>
+      </nav>
+      <div class="sidebar-footer">v1.0 — Protótipo</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h2 class="topbar-title">{% block title %}Painel de Controle{% endblock %}</h2>
+        <div class="topbar-right">
+          <button class="btn btn-outline">Notificações</button>
+          <button class="btn btn-primary">Novo Registro</button>
+        </div>
+      </header>
+
+      <section class="content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
