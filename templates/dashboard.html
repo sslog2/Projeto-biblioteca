@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card accent">
+    <!-- encaixe a api abaixo -->
+    <div class="stat-label">Total de Livros</div>
+    <div class="stat-value">1.842</div>
+    <div class="stat-sub">+12 esta semana</div>
+  </div>
+  <div class="stat-card verde">
+    <!-- encaixe a api abaixo -->
+    <div class="stat-label">Membros Ativos</div>
+    <div class="stat-value">314</div>
+    <div class="stat-sub">+8 este mês</div>
+  </div>
+  <div class="stat-card dourado">
+    <!-- encaixe a api abaixo -->
+    <div class="stat-label">Empréstimos Ativos</div>
+    <div class="stat-value">87</div>
+    <div class="stat-sub">23 próximos do vencimento</div>
+  </div>
+  <div class="stat-card">
+    <!-- encaixe a api abaixo -->
+    <div class="stat-label">Multas em Aberto</div>
+    <div class="stat-value" style="color: var(--accent)">R$ 412</div>
+    <div class="stat-sub">11 membros inadimplentes</div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Últimas Novidades</div>
+      <!-- encaixe a api abaixo -->
+      <span class="section-meta">3 novos livros</span>
+    </div>
+    <!-- encaixe a api abaixo -->
+    <div class="book-item">
+      <div class="book-cover" style="background: #2c5f2e">Ob</div>
+      <div class="book-info">
+        <div class="book-title">Cem Anos de Solidão</div>
+        <div class="book-author">Gabriel García Márquez</div>
+      </div>
+      <span class="badge badge-new">Novo</span>
+    </div>
+    <div class="book-item">
+      <div class="book-cover" style="background: #c0392b">Ma</div>
+      <div class="book-info">
+        <div class="book-title">Madame Bovary</div>
+        <div class="book-author">Gustave Flaubert</div>
+      </div>
+      <span class="badge badge-new">Novo</span>
+    </div>
+    <div class="book-item">
+      <div class="book-cover" style="background: #b8860b">Cr</div>
+      <div class="book-info">
+        <div class="book-title">Crime e Castigo</div>
+        <div class="book-author">Fiódor Dostoiévski</div>
+      </div>
+      <span class="badge badge-new">Novo</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Empréstimos Recentes</div>
+      <span class="section-meta">Hoje</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Membro</th>
+          <th>Livro</th>
+          <th>Devolução</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- encaixe a api abaixo -->
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div class="avatar">AM</div>
+              Ana M.
+            </div>
+          </td>
+          <td>Dom Casmurro</td>
+          <td>02 abr</td>
+          <td><span class="badge badge-ok">Em dia</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div class="avatar">JR</div>
+              João R.
+            </div>
+          </td>
+          <td>1984</td>
+          <td>28 mar</td>
+          <td><span class="badge badge-warn">Vencendo</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div class="avatar">LC</div>
+              Luiza C.
+            </div>
+          </td>
+          <td>A Hora da Estrela</td>
+          <td>20 mar</td>
+          <td><span class="badge badge-out">Atrasado</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -34,5 +34,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app.api.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('template/', TemplateView.as_view(template_name='index.html'), name='template-index'),
+    path('', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
+    path('feed/', TemplateView.as_view(template_name='feed.html'), name='feed'),
+    path('ranking/', TemplateView.as_view(template_name='ranking.html'), name='ranking'),
+    path('livros/', TemplateView.as_view(template_name='livros.html'), name='livros'),
+    path('editoras/', TemplateView.as_view(template_name='editoras.html'), name='editoras'),
+    path('membros/', TemplateView.as_view(template_name='membros.html'), name='membros'),
+    path('multa/', TemplateView.as_view(template_name='multa.html'), name='multa'),
 ]
