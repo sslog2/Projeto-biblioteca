@@ -1,12 +1,65 @@
 {% extends 'base.html' %}
 {% block title %}Feed de Novidades{% endblock %}
 {% block content %}
-<div class="card">
+<!-- ===== FEED ===== -->
+<div class="page" id="page-feed">
+  <div class="page-intro">
+    <h2>Feed de Novidades</h2>
+    <p>Livros recém-adicionados ao acervo da biblioteca</p>
+  </div>
+  <div class="card">
     <div class="card-header">
-        <div class="card-title">Feed de Novidades</div>
+      <div class="card-title">Março 2026</div>
+      <span class="badge badge-new">5 novos livros</span>
     </div>
-    <div style="padding: 20px;">
-        Conteúdo do feed em breve...
+    <div class="book-item">
+      <div class="book-cover" style="background: #2c5f2e">Ob</div>
+      <div class="book-info">
+        <div class="book-title">Cem Anos de Solidão</div>
+        <div class="book-author">
+          Gabriel García Márquez · Realismo Mágico
+        </div>
+      </div>
+      <span class="feed-date">27 mar</span>
     </div>
+    <div class="book-item">
+      <div class="book-cover" style="background: #c0392b">Ma</div>
+      <div class="book-info">
+        <div class="book-title">Madame Bovary</div>
+        <div class="book-author">
+          Gustave Flaubert · Romance Clássico
+        </div>
+      </div>
+      <span class="feed-date">26 mar</span>
+    </div>
+    <div class="book-item">
+      <div class="book-cover" style="background: #b8860b">Cr</div>
+      <div class="book-info">
+        <div class="book-title">Crime e Castigo</div>
+        <div class="book-author">
+          Fiódor Dostoiévski · Literatura Russa
+        </div>
+      </div>
+      <span class="feed-date">25 mar</span>
+    </div>
+    <div class="book-item">
+      <div class="book-cover" style="background: #1a237e">Al</div>
+      <div class="book-info">
+        <div class="book-title">A Alquimista</div>
+        <div class="book-author">Paulo Coelho · Ficção Filosófica</div>
+      </div>
+      <span class="feed-date">22 mar</span>
+    </div>
+    <div class="book-item">
+      <div class="book-cover" style="background: #4a148c">Vo</div>
+      <div class="book-info">
+        <div class="book-title">Voo Noturno</div>
+        <div class="book-author">
+          Antoine de Saint-Exupéry · Clássico
+        </div>
+      </div>
+      <span class="feed-date">18 mar</span>
+    </div>
+  </div>
 </div>
 {% endblock %}

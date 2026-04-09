@@ -1,12 +1,169 @@
 {% extends 'base.html' %}
 {% block title %}Ranking Semanal{% endblock %}
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <div class="card-title">Ranking Semanal</div>
+<!-- ===== RANKING ===== -->
+<div class="page" id="page-ranking">
+  <div class="page-intro">
+    <h2>Ranking Semanal</h2>
+    <p>Os livros mais emprestados nos últimos 7 dias</p>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Mais Emprestados</div>
+        <span class="section-meta">Semana 13 · 2026</span>
+      </div>
+      <div class="rank-item">
+        <div class="rank-num top">1</div>
+        <div
+          class="book-cover"
+          style="background: #c0392b; width: 32px; height: 44px"
+        >
+          19
+        </div>
+        <div class="rank-bar-wrap">
+          <div class="book-title" style="font-size: 14px">1984</div>
+          <div
+            class="book-author"
+            style="font-size: 12px; color: var(--muted)"
+          >
+            George Orwell · 34 empréstimos
+          </div>
+          <div class="rank-bar-bg">
+            <div class="rank-bar" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rank-item">
+        <div class="rank-num top">2</div>
+        <div
+          class="book-cover"
+          style="background: #2c5f2e; width: 32px; height: 44px"
+        >
+          Ob
+        </div>
+        <div class="rank-bar-wrap">
+          <div class="book-title" style="font-size: 14px">
+            Cem Anos de Solidão
+          </div>
+          <div
+            class="book-author"
+            style="font-size: 12px; color: var(--muted)"
+          >
+            García Márquez · 28 empréstimos
+          </div>
+          <div class="rank-bar-bg">
+            <div class="rank-bar" style="width: 82%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rank-item">
+        <div class="rank-num top">3</div>
+        <div
+          class="book-cover"
+          style="background: #b8860b; width: 32px; height: 44px"
+        >
+          Br
+        </div>
+        <div class="rank-bar-wrap">
+          <div class="book-title" style="font-size: 14px">
+            Brave New World
+          </div>
+          <div
+            class="book-author"
+            style="font-size: 12px; color: var(--muted)"
+          >
+            Aldous Huxley · 21 empréstimos
+          </div>
+          <div class="rank-bar-bg">
+            <div class="rank-bar" style="width: 62%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rank-item">
+        <div class="rank-num">4</div>
+        <div
+          class="book-cover"
+          style="background: #37474f; width: 32px; height: 44px"
+        >
+          Do
+        </div>
+        <div class="rank-bar-wrap">
+          <div class="book-title" style="font-size: 14px">
+            Dom Quixote
+          </div>
+          <div
+            class="book-author"
+            style="font-size: 12px; color: var(--muted)"
+          >
+            Cervantes · 17 empréstimos
+          </div>
+          <div class="rank-bar-bg">
+            <div class="rank-bar" style="width: 50%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rank-item">
+        <div class="rank-num">5</div>
+        <div
+          class="book-cover"
+          style="background: #4a148c; width: 32px; height: 44px"
+        >
+          Es
+        </div>
+        <div class="rank-bar-wrap">
+          <div class="book-title" style="font-size: 14px">
+            O Estrangeiro
+          </div>
+          <div
+            class="book-author"
+            style="font-size: 12px; color: var(--muted)"
+          >
+            Albert Camus · 14 empréstimos
+          </div>
+          <div class="rank-bar-bg">
+            <div class="rank-bar" style="width: 41%"></div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div style="padding: 20px;">
-        Conteúdo do ranking em breve...
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Por Gênero</div>
+      </div>
+      <table>
+        <tr>
+          <th>Gênero</th>
+          <th>Empréstimos</th>
+          <th>Variação</th>
+        </tr>
+        <tr>
+          <td>Clássico</td>
+          <td>89</td>
+          <td style="color: var(--accent2)">▲ +12%</td>
+        </tr>
+        <tr>
+          <td>Ficção Científica</td>
+          <td>64</td>
+          <td style="color: var(--accent2)">▲ +8%</td>
+        </tr>
+        <tr>
+          <td>Romance</td>
+          <td>51</td>
+          <td style="color: var(--muted)">— 0%</td>
+        </tr>
+        <tr>
+          <td>Filosofia</td>
+          <td>38</td>
+          <td style="color: var(--accent)">▼ -3%</td>
+        </tr>
+        <tr>
+          <td>Poesia</td>
+          <td>22</td>
+          <td style="color: var(--accent2)">▲ +5%</td>
+        </tr>
+      </table>
     </div>
+  </div>
 </div>
 {% endblock %}
