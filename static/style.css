@@ -402,8 +402,123 @@ tr:last-child td {
   background: var(--accent);
   border-radius: 2px;
 }
-ccent);
-  border-radius: 2px;
+
+/* Utils e Formulários */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
 }
--radius: 2px;
+.search-bar input,
+.search-bar select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  background: var(--card);
+}
+.search-bar input {
+  flex: 1;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 32px 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group.full {
+  grid-column: span 2;
+}
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bege);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  background: var(--background-lighter);
+  font-family: inherit;
+  transition: 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: white;
+}
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-footer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--bege);
+}
+.btn-ghost:hover {
+  background: var(--background);
+  color: var(--marrom);
+}
+
+.multa-result {
+  padding: 32px 24px;
+  text-align: center;
+}
+.multa-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--bege);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.multa-amount {
+  font-family: var(--serif);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.multa-detail {
+  font-size: 14px;
+  color: var(--bege);
 }
