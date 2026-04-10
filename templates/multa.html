@@ -1,12 +1,154 @@
 {% extends 'base.html' %}
+
 {% block title %}Calculador de Multa{% endblock %}
+
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <div class="card-title">Calculador de Multa</div>
+<!-- ===== MULTA ===== -->
+<div class="page" id="page-multa">
+  <div class="page-intro">
+    <h2>Calculador de Multa</h2>
+    <p>Calcule multas por atraso na devolução de livros</p>
+  </div>
+  <div class="two-col">
+    <div class="card" style="height: fit-content">
+      <div class="card-header">
+        <div class="card-title">Selecionar Membro</div>
+      </div>
+      <div
+        style="
+          padding: 20px 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        "
+      >
+        <div class="form-group">
+          <label>Membro</label>
+          <select id="membroSelect" onchange="updateMulta(this.value)">
+            <option value="">Selecionar membro...</option>
+            <option value="luiza">Luiza Costa — Inadimplente</option>
+            <option value="joao">João Ramos — Vencendo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor da multa por dia (R$)</label
+          ><input
+            type="number"
+            value="2.50"
+            step="0.50"
+            id="valorDia"
+            onchange="calcMulta()"
+          />
+        </div>
+        <button
+          class="btn btn-primary"
+          onclick="calcMulta()"
+          style="width: 100%; margin-top: 4px"
+        >
+          Calcular Multa
+        </button>
+      </div>
     </div>
-    <div style="padding: 20px;">
-        Calculadora de multas em breve...
+
+    <div>
+      <div class="card" style="margin-bottom: 16px">
+        <div
+          class="multa-result"
+          id="multa-result"
+          style="display: none"
+        >
+          <div class="multa-label">Total de Multa em Aberto</div>
+          <div class="multa-amount" id="multa-total">R$ 0,00</div>
+          <div class="multa-detail" id="multa-detail"></div>
+        </div>
+        <div
+          id="multa-placeholder"
+          style="
+            padding: 40px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+          "
+        >
+          Selecione um membro para calcular a multa
+        </div>
+      </div>
+      <div
+        class="multa-books"
+        id="multa-books"
+        style="display: none; padding: 0"
+      ></div>
     </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const data = {
+    luiza: {
+      nome: "Luiza Costa",
+      atraso: 14,
+      livros: [
+        { titulo: "A Hora da Estrela", dias: 14 },
+        { titulo: "Dom Casmurro", dias: 5 }
+      ]
+    },
+    joao: {
+      nome: "João Ramos",
+      atraso: 3,
+      livros: [
+        { titulo: "1984", dias: 3 }
+      ]
+    }
+  };
+
+  function updateMulta(membro) {
+    if (!membro) {
+      document.getElementById('multa-result').style.display = 'none';
+      document.getElementById('multa-placeholder').style.display = 'block';
+      document.getElementById('multa-books').style.display = 'none';
+      return;
+    }
+    calcMulta();
+  }
+
+  function calcMulta() {
+    const membroKey = document.getElementById('membroSelect').value;
+    const valorDia = parseFloat(document.getElementById('valorDia').value) || 0;
+    
+    if (!membroKey) return;
+
+    const membro = data[membroKey];
+    let totalDias = 0;
+    let htmlLivros = '<div class="card"><div class="card-header"><div class="card-title">Livros Atrasados</div></div>';
+    
+    membro.livros.forEach(livro => {
+      totalDias += livro.dias;
+      const valorLivro = (livro.dias * valorDia).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      htmlLivros += `
+        <div class="book-item">
+          <div class="book-info">
+            <div class="book-title">${livro.titulo}</div>
+            <div class="book-author">${livro.dias} dias de atraso</div>
+          </div>
+          <div style="font-weight: 600; color: var(--accent)">${valorLivro}</div>
+        </div>
+      `;
+    });
+    htmlLivros += '</div>';
+
+    const totalMulta = (totalDias * valorDia).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    
+    document.getElementById('multa-total').innerText = totalMulta;
+    document.getElementById('multa-detail').innerText = `${membro.nome} possui ${totalDias} dias de atraso acumulados.`;
+    
+    document.getElementById('multa-result').style.display = 'block';
+    document.getElementById('multa-placeholder').style.display = 'none';
+    
+    const booksDiv = document.getElementById('multa-books');
+    booksDiv.innerHTML = htmlLivros;
+    booksDiv.style.display = 'block';
+  }
+</script>
 {% endblock %}

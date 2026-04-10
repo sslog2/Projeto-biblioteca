@@ -1,12 +1,112 @@
 {% extends 'base.html' %}
+
 {% block title %}Editoras{% endblock %}
+
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <div class="card-title">Gestão de Editoras</div>
+<!-- ===== EDITORAS ===== -->
+<div class="page" id="page-editoras">
+  <div class="page-intro">
+    <h2>Cadastro de Editoras</h2>
+    <p>Gerencie as editoras parceiras do acervo</p>
+  </div>
+  <div class="search-bar">
+    <input type="text" placeholder="Buscar editora..." />
+    <button class="btn btn-primary">+ Nova Editora</button>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <table>
+        <tr>
+          <th>Editora</th>
+          <th>País</th>
+          <th>Livros</th>
+          <th></th>
+        </tr>
+        <tr>
+          <td><strong>Companhia das Letras</strong></td>
+          <td>Brasil</td>
+          <td>312</td>
+          <td>
+            <button class="btn btn-ghost" style="font-size: 12px">
+              Ver
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Record</strong></td>
+          <td>Brasil</td>
+          <td>187</td>
+          <td>
+            <button class="btn btn-ghost" style="font-size: 12px">
+              Ver
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Martin Claret</strong></td>
+          <td>Brasil</td>
+          <td>145</td>
+          <td>
+            <button class="btn btn-ghost" style="font-size: 12px">
+              Ver
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Penguin Books</strong></td>
+          <td>Reino Unido</td>
+          <td>98</td>
+          <td>
+            <button class="btn btn-ghost" style="font-size: 12px">
+              Ver
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Gallimard</strong></td>
+          <td>França</td>
+          <td>54</td>
+          <td>
+            <button class="btn btn-ghost" style="font-size: 12px">
+              Ver
+            </button>
+          </td>
+        </tr>
+      </table>
     </div>
-    <div style="padding: 20px;">
-        Lista de editoras em breve...
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Nova Editora</div>
+      </div>
+      <div class="form-grid" style="grid-template-columns: 1fr">
+        <div class="form-group">
+          <label>Nome da Editora</label
+          ><input type="text" placeholder="Ex: Companhia das Letras" />
+        </div>
+        <div class="form-group">
+          <label>País de Origem</label
+          ><select>
+            <option>Brasil</option>
+            <option>Portugal</option>
+            <option>Estados Unidos</option>
+            <option>Reino Unido</option>
+            <option>França</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Site Oficial</label
+          ><input type="url" placeholder="https://" />
+        </div>
+        <div class="form-group">
+          <label>E-mail de Contato</label
+          ><input type="email" placeholder="contato@editora.com" />
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-outline">Limpar</button>
+        <button class="btn btn-primary">Salvar Editora</button>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
