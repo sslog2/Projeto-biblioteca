@@ -69,6 +69,18 @@ class Emprestimo(models.Model):
     def __str__(self):
         return f"{self.membro.nome} — {self.livro.titulo}"
 
+    @property
+    def esta_atrasado(self):
+        from datetime import date
+        return not self.devolvido and self.data_devolucao < date.today()
+
+    @property
+    def dias_atraso(self):
+        from datetime import date
+        if self.esta_atrasado:
+            return (date.today() - self.data_devolucao).days
+        return 0
+
 
 class Multa(models.Model):
     emprestimo = models.OneToOneField(

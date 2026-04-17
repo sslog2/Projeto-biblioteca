@@ -5,28 +5,24 @@
 {% block content %}
 <div class="stats-grid">
   <div class="stat-card accent">
-    <!-- encaixe a api abaixo -->
     <div class="stat-label">Total de Livros</div>
-    <div class="stat-value">1.842</div>
-    <div class="stat-sub">+12 esta semana</div>
+    <div class="stat-value">{{ total_livros }}</div>
+    <div class="stat-sub">+{{ livros_novos_semana }} esta semana</div>
   </div>
   <div class="stat-card verde">
-    <!-- encaixe a api abaixo -->
     <div class="stat-label">Membros Ativos</div>
-    <div class="stat-value">314</div>
-    <div class="stat-sub">+8 este mês</div>
+    <div class="stat-value">{{ membros_ativos }}</div>
+    <div class="stat-sub">+{{ membros_novos_mes }} este mês</div>
   </div>
   <div class="stat-card dourado">
-    <!-- encaixe a api abaixo -->
     <div class="stat-label">Empréstimos Ativos</div>
-    <div class="stat-value">87</div>
-    <div class="stat-sub">23 próximos do vencimento</div>
+    <div class="stat-value">{{ emprestimos_ativos }}</div>
+    <div class="stat-sub">{{ proximos_vencimento }} próximos do vencimento</div>
   </div>
   <div class="stat-card">
-    <!-- encaixe a api abaixo -->
     <div class="stat-label">Multas em Aberto</div>
-    <div class="stat-value" style="color: var(--accent)">R$ 412</div>
-    <div class="stat-sub">11 membros inadimplentes</div>
+    <div class="stat-value" style="color: var(--accent)">R$ {{ multas_valor_total }}</div>
+    <div class="stat-sub">{{ multas_count }} multas pendentes</div>
   </div>
 </div>
 
@@ -34,40 +30,26 @@
   <div class="card">
     <div class="card-header">
       <div class="card-title">Últimas Novidades</div>
-      <!-- encaixe a api abaixo -->
-      <span class="section-meta">3 novos livros</span>
+      <span class="section-meta">{{ ultimos_livros|length }} novos livros</span>
     </div>
-    <!-- encaixe a api abaixo -->
+    {% for livro in ultimos_livros %}
     <div class="book-item">
-      <div class="book-cover" style="background: #2c5f2e">Ob</div>
+      <div class="book-cover" style="background: var(--accent)">{{ livro.titulo|slice:":2"|upper }}</div>
       <div class="book-info">
-        <div class="book-title">Cem Anos de Solidão</div>
-        <div class="book-author">Gabriel García Márquez</div>
+        <div class="book-title">{{ livro.titulo }}</div>
+        <div class="book-author">{{ livro.autor }}</div>
       </div>
       <span class="badge badge-new">Novo</span>
     </div>
-    <div class="book-item">
-      <div class="book-cover" style="background: #c0392b">Ma</div>
-      <div class="book-info">
-        <div class="book-title">Madame Bovary</div>
-        <div class="book-author">Gustave Flaubert</div>
-      </div>
-      <span class="badge badge-new">Novo</span>
-    </div>
-    <div class="book-item">
-      <div class="book-cover" style="background: #b8860b">Cr</div>
-      <div class="book-info">
-        <div class="book-title">Crime e Castigo</div>
-        <div class="book-author">Fiódor Dostoiévski</div>
-      </div>
-      <span class="badge badge-new">Novo</span>
-    </div>
+    {% empty %}
+    <p>Nenhum livro cadastrado recentemente.</p>
+    {% endfor %}
   </div>
 
   <div class="card">
     <div class="card-header">
       <div class="card-title">Empréstimos Recentes</div>
-      <span class="section-meta">Hoje</span>
+      <span class="section-meta">Geral</span>
     </div>
     <table>
       <thead>
@@ -79,40 +61,31 @@
         </tr>
       </thead>
       <tbody>
-        <!-- encaixe a api abaixo -->
+        {% for emprestimo in emprestimos_recentes %}
         <tr>
           <td>
             <div style="display: flex; align-items: center; gap: 8px">
-              <div class="avatar">AM</div>
-              Ana M.
+              <div class="avatar">{{ emprestimo.membro.iniciais }}</div>
+              {{ emprestimo.membro.nome }}
             </div>
           </td>
-          <td>Dom Casmurro</td>
-          <td>02 abr</td>
-          <td><span class="badge badge-ok">Em dia</span></td>
-        </tr>
-        <tr>
+          <td>{{ emprestimo.livro.titulo }}</td>
+          <td>{{ emprestimo.data_devolucao|date:"d M" }}</td>
           <td>
-            <div style="display: flex; align-items: center; gap: 8px">
-              <div class="avatar">JR</div>
-              João R.
-            </div>
+            {% if emprestimo.devolvido %}
+              <span class="badge badge-ok">Devolvido</span>
+            {% elif emprestimo.esta_atrasado %}
+              <span class="badge badge-out">Atrasado</span>
+            {% else %}
+              <span class="badge badge-ok">Em dia</span>
+            {% endif %}
           </td>
-          <td>1984</td>
-          <td>28 mar</td>
-          <td><span class="badge badge-warn">Vencendo</span></td>
         </tr>
+        {% empty %}
         <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 8px">
-              <div class="avatar">LC</div>
-              Luiza C.
-            </div>
-          </td>
-          <td>A Hora da Estrela</td>
-          <td>20 mar</td>
-          <td><span class="badge badge-out">Atrasado</span></td>
+          <td colspan="4">Nenhum empréstimo recente.</td>
         </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>

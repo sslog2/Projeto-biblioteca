@@ -1,12 +1,91 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
+from django.shortcuts import render
+from django.views import View
 from django.db.models import Count, Sum, Q, F
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.api.models import Livro, Membro, Emprestimo, Multa
+from app.api.models import Livro, Membro, Emprestimo, Multa, Editora
 
+class DashboardTemplateView(View):
+    def get(self, request):
+        hoje = date.today()
+        semana_atras = hoje - timedelta(days=7)
+
+        total_livros = Livro.objects.count()
+        livros_semana = Livro.objects.filter(data_cadastro__date__gte=semana_atras).count()
+
+        membros_ativos = Membro.objects.filter(ativo=True).count()
+        membros_mes = Membro.objects.filter(
+            data_cadastro__month=hoje.month, data_cadastro__year=hoje.year
+        ).count()
+
+        emprestimos_ativos = Emprestimo.objects.filter(devolvido=False).count()
+        proximos_vencimento = Emprestimo.objects.filter(
+            devolvido=False,
+            data_devolucao__lte=hoje + timedelta(days=3),
+            data_devolucao__gte=hoje,
+        ).count()
+
+        multas_abertas = Multa.objects.filter(pago=False).aggregate(
+            total=Sum('valor'), count=Count('id')
+        )
+
+        ultimos_livros = Livro.objects.all().order_by('-data_cadastro')[:3]
+        emprestimos_recentes = Emprestimo.objects.select_related('membro', 'livro').all().order_by('-data_emprestimo')[:5]
+
+        context = {
+            'total_livros': total_livros,
+            'livros_novos_semana': livros_semana,
+            'membros_ativos': membros_ativos,
+            'membros_novos_mes': membros_mes,
+            'emprestimos_ativos': emprestimos_ativos,
+            'proximos_vencimento': proximos_vencimento,
+            'multas_valor_total': multas_abertas['total'] or Decimal('0.00'),
+            'multas_count': multas_abertas['count'],
+            'ultimos_livros': ultimos_livros,
+            'emprestimos_recentes': emprestimos_recentes,
+        }
+        return render(request, 'dashboard.html', context)
+
+class FeedTemplateView(View):
+    def get(self, request):
+        livros = Livro.objects.select_related('editora').all().order_by('-data_cadastro')
+        return render(request, 'feed.html', {'livros': livros})
+
+class RankingTemplateView(View):
+    def get(self, request):
+        hoje = date.today()
+        desde = hoje - timedelta(days=7)
+        ranking = (
+            Livro.objects
+            .filter(emprestimos__data_emprestimo__gte=desde)
+            .annotate(total_emprestimos=Count('emprestimos'))
+            .order_by('-total_emprestimos')[:10]
+        )
+        return render(request, 'ranking.html', {'ranking': ranking})
+
+class LivrosTemplateView(View):
+    def get(self, request):
+        livros = Livro.objects.select_related('editora').all()
+        return render(request, 'livros.html', {'livros': livros})
+
+class EditorasTemplateView(View):
+    def get(self, request):
+        editoras = Editora.objects.all()
+        return render(request, 'editoras.html', {'editoras': editoras})
+
+class MembrosTemplateView(View):
+    def get(self, request):
+        membros = Membro.objects.all()
+        return render(request, 'membros.html', {'membros': membros})
+
+class MultaTemplateView(View):
+    def get(self, request):
+        emprestimos_atrasados = Emprestimo.objects.filter(devolvido=False, data_devolucao__lt=date.today()).select_related('membro', 'livro')
+        return render(request, 'multa.html', {'atrasados': emprestimos_atrasados})
 
 class DashboardView(APIView):
 
