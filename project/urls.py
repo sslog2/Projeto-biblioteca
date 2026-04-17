@@ -16,10 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from app.utils.views import (
+    DashboardTemplateView,
+    FeedTemplateView,
+    RankingTemplateView,
+    LivrosTemplateView,
+    EditorasTemplateView,
+    MembrosTemplateView,
+    MultaTemplateView
+)
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,11 +43,11 @@ urlpatterns = [
     path('api/', include('app.api.urls')),
     path('api/utils/', include('app.utils.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
-    path('feed/', TemplateView.as_view(template_name='feed.html'), name='feed'),
-    path('ranking/', TemplateView.as_view(template_name='ranking.html'), name='ranking'),
-    path('livros/', TemplateView.as_view(template_name='livros.html'), name='livros'),
-    path('editoras/', TemplateView.as_view(template_name='editoras.html'), name='editoras'),
-    path('membros/', TemplateView.as_view(template_name='membros.html'), name='membros'),
-    path('multa/', TemplateView.as_view(template_name='multa.html'), name='multa'),
+    path('', DashboardTemplateView.as_view(), name='dashboard'),
+    path('feed/', FeedTemplateView.as_view(), name='feed'),
+    path('ranking/', RankingTemplateView.as_view(), name='ranking'),
+    path('livros/', LivrosTemplateView.as_view(), name='livros'),
+    path('editoras/', EditorasTemplateView.as_view(), name='editoras'),
+    path('membros/', MembrosTemplateView.as_view(), name='membros'),
+    path('multa/', MultaTemplateView.as_view(), name='multa'),
 ]
