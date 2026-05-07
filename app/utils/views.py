@@ -1,13 +1,14 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.db.models import Count, Sum, Q, F
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.api.models import Livro, Membro, Emprestimo, Multa, Editora
+from app.api.forms import LivroForm, MembroForm, EditoraForm, EmprestimoForm
 
 class DashboardTemplateView(View):
     def get(self, request):
@@ -75,17 +76,68 @@ class LivrosTemplateView(View):
 class EditorasTemplateView(View):
     def get(self, request):
         editoras = Editora.objects.all()
-        return render(request, 'editoras.html', {'editoras': editoras})
+        form = EditoraForm()
+        return render(request, 'editoras.html', {'editoras': editoras, 'form': form})
+
+    def post(self, request):
+        form = EditoraForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('editoras')
+        editoras = Editora.objects.all()
+        return render(request, 'editoras.html', {'editoras': editoras, 'form': form})
 
 class MembrosTemplateView(View):
     def get(self, request):
         membros = Membro.objects.all()
         return render(request, 'membros.html', {'membros': membros})
 
+class MembroDetalheTemplateView(View):
+    def get(self, request, pk):
+        membro = get_object_or_404(Membro, pk=pk)
+        emprestimos = Emprestimo.objects.filter(membro=membro).select_related('livro').order_by('-data_emprestimo')
+        return render(request, 'membro_detalhe.html', {'membro': membro, 'emprestimos': emprestimos})
+
+class EmprestimoCreateTemplateView(View):
+    def get(self, request):
+        form = EmprestimoForm()
+        return render(request, 'emprestimo_form.html', {'form': form, 'titulo': 'Novo Empréstimo'})
+
+    def post(self, request):
+        form = EmprestimoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+        return render(request, 'emprestimo_form.html', {'form': form, 'titulo': 'Novo Empréstimo'})
+
 class MultaTemplateView(View):
     def get(self, request):
         emprestimos_atrasados = Emprestimo.objects.filter(devolvido=False, data_devolucao__lt=date.today()).select_related('membro', 'livro')
         return render(request, 'multa.html', {'atrasados': emprestimos_atrasados})
+
+class LivroCreateTemplateView(View):
+    def get(self, request):
+        form = LivroForm()
+        return render(request, 'livro_form.html', {'form': form, 'titulo': 'Cadastrar Livro'})
+
+    def post(self, request):
+        form = LivroForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('livros')
+        return render(request, 'livro_form.html', {'form': form, 'titulo': 'Cadastrar Livro'})
+
+class MembroCreateTemplateView(View):
+    def get(self, request):
+        form = MembroForm()
+        return render(request, 'membro_form.html', {'form': form, 'titulo': 'Cadastrar Membro'})
+
+    def post(self, request):
+        form = MembroForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('membros')
+        return render(request, 'membro_form.html', {'form': form, 'titulo': 'Cadastrar Membro'})
 
 class DashboardView(APIView):
 

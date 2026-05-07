@@ -10,7 +10,6 @@
   </div>
   <div class="search-bar">
     <input type="text" placeholder="Buscar editora..." />
-    <button class="btn btn-primary">+ Nova Editora</button>
   </div>
   <div class="two-col">
     <div class="card">
@@ -18,7 +17,7 @@
         <thead>
           <tr>
             <th>Editora</th>
-            <th>País</th>
+            <th>E-mail</th>
             <th>Livros</th>
             <th></th>
           </tr>
@@ -27,7 +26,7 @@
           {% for editora in editoras %}
           <tr>
             <td><strong>{{ editora.nome }}</strong></td>
-            <td>{{ editora.pais|default:"-" }}</td>
+            <td>{{ editora.email|default:"-" }}</td>
             <td>{{ editora.livros.count }}</td>
             <td>
               <button class="btn btn-ghost" style="font-size: 12px">
@@ -43,29 +42,48 @@
         </tbody>
       </table>
     </div>
+
     <div class="card">
       <div class="card-header">
         <div class="card-title">Nova Editora</div>
       </div>
-      <div class="form-grid" style="grid-template-columns: 1fr">
-        <div class="form-group">
-          <label>Nome da Editora</label
-          ><input type="text" placeholder="Ex: Companhia das Letras" />
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-grid" style="grid-template-columns: 1fr; padding: 1.5rem;">
+          {% for field in form %}
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div style="color: var(--danger); font-size: 12px; margin-top: 0.25rem;">{{ field.errors }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
         </div>
-        <div class="form-group">
-          <label>País de Origem</label
-          ><input type="text" placeholder="Ex: Brasil" />
+        <div class="form-footer" style="padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 1rem;">
+          <button type="reset" class="btn btn-outline">Limpar</button>
+          <button type="submit" class="btn btn-primary">Salvar Editora</button>
         </div>
-        <div class="form-group">
-          <label>Site Oficial</label
-          ><input type="url" placeholder="https://" />
-        </div>
-      </div>
-      <div class="form-footer">
-        <button class="btn btn-outline">Limpar</button>
-        <button class="btn btn-primary">Salvar Editora</button>
-      </div>
+      </form>
     </div>
   </div>
 </div>
+
+<style>
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+</style>
 {% endblock %}

@@ -26,7 +26,11 @@ from app.utils.views import (
     LivrosTemplateView,
     EditorasTemplateView,
     MembrosTemplateView,
-    MultaTemplateView
+    MembroDetalheTemplateView,
+    MultaTemplateView,
+    LivroCreateTemplateView,
+    MembroCreateTemplateView,
+    EmprestimoCreateTemplateView
 )
 
 schema_view = get_schema_view(
@@ -47,7 +51,11 @@ urlpatterns = [
     path('feed/', FeedTemplateView.as_view(), name='feed'),
     path('ranking/', RankingTemplateView.as_view(), name='ranking'),
     path('livros/', LivrosTemplateView.as_view(), name='livros'),
+    path('livros/novo/', LivroCreateTemplateView.as_view(), name='livro-create'),
     path('editoras/', EditorasTemplateView.as_view(), name='editoras'),
     path('membros/', MembrosTemplateView.as_view(), name='membros'),
+    path('membros/<int:pk>/', MembroDetalheTemplateView.as_view(), name='membro-detail'),
+    path('membros/novo/', MembroCreateTemplateView.as_view(), name='membro-create'),
+    path('emprestimos/novo/', EmprestimoCreateTemplateView.as_view(), name='emprestimo-create'),
     path('multa/', MultaTemplateView.as_view(), name='multa'),
 ]

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Membro{% endblock %}
+
+{% block content %}
+<div class="page active">
+  <div class="page-intro">
+    <h2>{{ membro.nome }}</h2>
+    <p>Detalhes do membro e histórico de empréstimos</p>
+  </div>
+
+  <div class="two-col">
+    <!-- Informações do Membro -->
+    <div class="card" style="padding: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="avatar" style="width: 64px; height: 64px; font-size: 24px;">{{ membro.iniciais }}</div>
+        <div>
+          <h3 style="margin: 0; font-size: 20px;">{{ membro.nome }}</h3>
+          <span class="badge {% if membro.ativo %}badge-ok{% else %}badge-out{% endif %}">
+            {% if membro.ativo %}Ativo{% else %}Inativo{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div style="display: grid; gap: 1rem;">
+        <div>
+          <label style="color: var(--muted); font-size: 12px; display: block;">E-mail</label>
+          <div style="font-weight: 500;">{{ membro.email }}</div>
+        </div>
+        <div>
+          <label style="color: var(--muted); font-size: 12px; display: block;">Telefone</label>
+          <div style="font-weight: 500;">{{ membro.telefone|default:"Não informado" }}</div>
+        </div>
+        <div>
+          <label style="color: var(--muted); font-size: 12px; display: block;">Membro desde</label>
+          <div style="font-weight: 500;">{{ membro.data_cadastro|date:"d/m/Y" }}</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <a href="{% url 'membros' %}" class="btn btn-outline" style="width: 100%; text-align: center;">Voltar para Lista</a>
+      </div>
+    </div>
+
+    <!-- Histórico de Empréstimos -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Histórico de Empréstimos</div>
+      </div>
+      <table style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Livro</th>
+            <th>Data Empréstimo</th>
+            <th>Data Devolução</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emprestimo in emprestimos %}
+          <tr>
+            <td>
+              <div style="font-weight: 500;">{{ emprestimo.livro.titulo }}</div>
+              <div style="font-size: 12px; color: var(--muted);">{{ emprestimo.livro.autor }}</div>
+            </td>
+            <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+            <td>{{ emprestimo.data_devolucao|date:"d/m/Y" }}</td>
+            <td>
+              {% if emprestimo.devolvido %}
+                <span class="badge badge-ok">Devolvido</span>
+              {% elif emprestimo.esta_atrasado %}
+                <span class="badge badge-out">Atrasado</span>
+              {% else %}
+                <span class="badge badge-warn">Em dia</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--muted);">
+              Nenhum empréstimo registrado para este membro.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

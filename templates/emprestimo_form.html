@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="page active">
+  <div class="page-intro">
+    <h2>{{ titulo }}</h2>
+    <p>Selecione o membro e o livro para registrar um novo empréstimo</p>
+  </div>
+
+  <div class="card" style="max-width: 500px; margin: 2rem auto; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 16px;">
+    <form method="post">
+      {% csrf_token %}
+      
+      {% for field in form %}
+      <div style="margin-bottom: 1.5rem;">
+        <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text);">
+          {{ field.label }}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+          <div style="color: var(--danger); font-size: 14px; margin-top: 0.25rem;">
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div style="display: grid; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn btn-primary" style="height: 48px; font-size: 16px;">Confirmar Empréstimo</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline" style="height: 48px; font-size: 16px;">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(110, 68, 255, 0.1);
+  }
+  select.form-control {
+    cursor: pointer;
+  }
+</style>
+{% endblock %}

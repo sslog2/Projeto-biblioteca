@@ -16,7 +16,7 @@
       <option>Inadimplente</option>
       <option>Inativo</option>
     </select>
-    <button class="btn btn-primary">+ Novo Membro</button>
+    <button class="btn btn-primary" onclick="window.location.href='{% url 'membro-create' %}'">+ Novo Membro</button>
   </div>
   <div class="card" style="margin-bottom: 28px">
     <table>
@@ -54,9 +54,9 @@
             {% endif %}
           </td>
           <td>
-            <button class="btn btn-ghost" style="font-size: 12px">
+            <a href="{% url 'membro-detail' membro.id %}" class="btn btn-ghost" style="font-size: 12px; text-decoration: none;">
               Ver
-            </button>
+            </a>
           </td>
         </tr>
         {% empty %}

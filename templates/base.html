@@ -55,7 +55,7 @@
         <h2 class="topbar-title">{% block title %}Painel de Controle{% endblock %}</h2>
         <div class="topbar-right">
           <button class="btn btn-outline">Notificações</button>
-          <button class="btn btn-primary">Novo Registro</button>
+          <a href="{% url 'emprestimo-create' %}" class="btn btn-primary" style="text-decoration: none;">Novo Registro</a>
         </div>
       </header>
 
@@ -64,6 +64,7 @@
       </section>
     </main>
 
+    <script src="{% static 'script.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
