@@ -54,9 +54,17 @@
             {% endif %}
           </td>
           <td>
-            <a href="{% url 'membro-detail' membro.id %}" class="btn btn-ghost" style="font-size: 12px; text-decoration: none;">
-              Ver
-            </a>
+            <div style="display: flex; gap: 5px;">
+              <a href="{% url 'membro-detail' membro.id %}" class="btn btn-ghost" style="font-size: 12px; text-decoration: none;">
+                Ver
+              </a>
+              <form action="{% url 'membro-status' membro.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if membro.ativo %}btn-outline{% else %}btn-primary{% endif %} btn-sm" style="font-size: 11px; padding: 2px 8px;">
+                  {% if membro.ativo %}Desativar{% else %}Ativar{% endif %}
+                </button>
+              </form>
+            </div>
           </td>
         </tr>
         {% empty %}

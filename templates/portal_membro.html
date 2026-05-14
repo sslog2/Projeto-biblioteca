@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Bem-vindo, {{ membro.nome }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <p>Aqui você pode gerenciar seus empréstimos, renovar livros e fazer reservas.</p>
+    <a href="{% url 'portal-logout' %}" class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;">Sair</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+    
+    <!-- Coluna da Esquerda: Empréstimos e Reservas -->
+    <div>
+        <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+                <h3 class="card-title">Meus Empréstimos Atuais</h3>
+            </div>
+            <div class="card-body">
+                {% if emprestimos %}
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                                <th style="padding: 10px;">Livro</th>
+                                <th style="padding: 10px;">Data Devolução</th>
+                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px;">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in emprestimos %}
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 10px;">{{ emp.livro.titulo }}</td>
+                                    <td style="padding: 10px;">{{ emp.data_devolucao }}</td>
+                                    <td style="padding: 10px;">
+                                        {% if emp.esta_atrasado %}
+                                            <span style="color: #dc3545; font-weight: bold;">Atrasado</span>
+                                        {% else %}
+                                            <span style="color: #28a745;">Em dia</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 10px;">
+                                        <form action="{% url 'renovar-emprestimo' emp.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary btn-sm" {% if emp.esta_atrasado %}disabled title="Livros atrasados não podem ser renovados"{% endif %}>
+                                                Renovar +7 dias
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p style="color: #666; padding: 10px;">Você não tem livros emprestados no momento.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Nova Seção: Reservas Ativas -->
+        <div class="card" style="margin-bottom: 20px; border-left: 5px solid #ffc107;">
+            <div class="card-header">
+                <h3 class="card-title">Minhas Reservas Ativas</h3>
+            </div>
+            <div class="card-body">
+                {% if reservas %}
+                    <ul style="list-style: none; padding: 0;">
+                        {% for reserva in reservas %}
+                            <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                                <span><strong>{{ reserva.livro.titulo }}</strong></span>
+                                <span class="badge" style="background: #fff3cd; color: #856404; font-size: 11px;">Aguardando Disponibilidade</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: #666; padding: 10px;">Você não possui reservas no momento.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Explorar Catálogo e Reservar</h3>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                    {% for livro in todos_livros %}
+                        <div style="padding: 15px; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0 0 5px 0; font-size: 14px;">{{ livro.titulo }}</h4>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #666;">{{ livro.autor }}</p>
+                            
+                            {% if livro in reservas_livros %}
+                                <button class="btn btn-sm" disabled style="width: 100%; background: #eee; color: #999; border: none;">Já Reservado</button>
+                            {% else %}
+                                <form action="{% url 'reservar-livro' livro.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline btn-sm" style="width: 100%;">Reservar</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Seção: Histórico de Leitura -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3 class="card-title">Seu Histórico de Leitura (Concluídos)</h3>
+            </div>
+            <div class="card-body">
+                {% if historico %}
+                    <ul style="list-style: none; padding: 0;">
+                        {% for item in historico %}
+                            <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                                <span><strong>{{ item.livro.titulo }}</strong> - {{ item.livro.autor }}</span>
+                                <span style="color: #666; font-size: 12px;">Devolvido em {{ item.data_devolucao }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: #666; padding: 10px;">Você ainda não devolveu nenhum livro.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Coluna da Direita: Multas e Informações -->
+    <div>
+        <!-- Nova Seção: Recomendações -->
+        <div class="card" style="margin-bottom: 20px; border-left: 5px solid #28a745;">
+            <div class="card-header">
+                <h3 class="card-title">Recomendados para Você</h3>
+                <small style="color: #666;">Baseado no seu perfil de leitura</small>
+            </div>
+            <div class="card-body">
+                {% for rec in recomendacoes %}
+                    <div style="padding: 10px; border-bottom: 1px solid #eee; margin-bottom: 5px;">
+                        <p style="margin: 0; font-size: 14px; font-weight: 500;">{{ rec.titulo }}</p>
+                        <p style="margin: 0; font-size: 12px; color: #666;">{{ rec.autor }}</p>
+                        <form action="{% url 'reservar-livro' rec.id %}" method="post" style="margin-top: 5px;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm" style="font-size: 10px; padding: 2px 8px;">Reservar</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px; border-left: 5px solid #dc3545;">
+            <div class="card-header">
+                <h3 class="card-title">Pendências Financeiras</h3>
+            </div>
+            <div class="card-body">
+                {% if multas %}
+                    {% for multa in multas %}
+                        <div style="padding: 10px; background: #fff5f5; border-radius: 4px; margin-bottom: 10px;">
+                            <p style="margin: 0; font-weight: bold; color: #721c24;">R$ {{ multa.valor }}</p>
+                            <small style="color: #666;">Referente ao livro: {{ multa.emprestimo.livro.titulo }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #28a745;">Você não possui multas pendentes. Parabéns!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Seus Dados</h3>
+            </div>
+            <div class="card-body" style="font-size: 14px;">
+                <p><strong>E-mail:</strong> {{ membro.email }}</p>
+                <p><strong>Telefone:</strong> {{ membro.telefone|default:"Não informado" }}</p>
+                <p><strong>CPF:</strong> {{ membro.cpf|default:"Não informado" }}</p>
+                <p><strong>Endereço:</strong> {{ membro.endereco|default:"Não informado" }}</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

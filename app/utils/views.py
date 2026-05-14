@@ -1,16 +1,261 @@
+import csv
 from datetime import date, timedelta
 from decimal import Decimal
 
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.db.models import Count, Sum, Q, F
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.api.models import Livro, Membro, Emprestimo, Multa, Editora
+from app.api.models import Livro, Membro, Emprestimo, Multa, Editora, Reserva
 from app.api.forms import LivroForm, MembroForm, EditoraForm, EmprestimoForm
 
-class DashboardTemplateView(View):
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+class ExportarAtrasadosCSVView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="inadimplentes.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Membro', 'Livro', 'Data Devolução', 'Dias de Atraso', 'Valor da Multa'])
+
+        atrasados = Emprestimo.objects.filter(
+            devolvido=False, 
+            data_devolucao__lt=date.today()
+        ).select_related('membro', 'livro')
+
+        for emp in atrasados:
+            multa_valor = Decimal('0.00')
+            if hasattr(emp, 'multa'):
+                multa_valor = emp.multa.valor
+            else:
+                # Simula valor se não tiver multa criada ainda
+                dias = (date.today() - emp.data_devolucao).days
+                multa_valor = Decimal('1.50') * dias
+
+            writer.writerow([
+                emp.membro.nome,
+                emp.livro.titulo,
+                emp.data_devolucao,
+                (date.today() - emp.data_devolucao).days,
+                f'R$ {multa_valor}'
+            ])
+
+        return response
+
+class RenovarEmprestimoView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        emprestimo = get_object_or_404(Emprestimo, pk=pk)
+        
+        # Tenta pegar o membro do usuário logado
+        try:
+            membro_logado = Membro.objects.get(user=request.user)
+        except Membro.DoesNotExist:
+            membro_logado = None
+
+        # Validação: só o próprio membro ou admin pode renovar
+        if not request.user.is_staff and (not membro_logado or emprestimo.membro != membro_logado):
+            messages.error(request, "Você não tem permissão para renovar este empréstimo.")
+            return redirect('portal-membro')
+
+        if emprestimo.esta_atrasado:
+            messages.error(request, f"O livro '{emprestimo.livro.titulo}' está atrasado (venceu em {emprestimo.data_devolucao}). Por favor, devolva-o na biblioteca.")
+        else:
+            emprestimo.data_devolucao += timedelta(days=7)
+            emprestimo.save()
+            messages.success(request, f"Sucesso! A nova data de devolução para '{emprestimo.livro.titulo}' é {emprestimo.data_devolucao}.")
+        
+        return redirect('portal-membro')
+
+class ReservarLivroView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        livro = get_object_or_404(Livro, pk=pk)
+        membro = get_object_or_404(Membro, user=request.user)
+
+        # Verifica se já tem uma reserva ativa para esse livro
+        reserva_existente = Reserva.objects.filter(membro=membro, livro=livro, status=Reserva.Status.ATIVA).exists()
+        if reserva_existente:
+            messages.warning(request, f"Você já possui uma reserva ativa para o livro '{livro.titulo}'.")
+        else:
+            Reserva.objects.create(membro=membro, livro=livro)
+            messages.success(request, f"Reserva realizada com sucesso para o livro '{livro.titulo}'!")
+        
+        return redirect('portal-membro')
+
+class PortalLoginView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            if request.user.is_staff:
+                return redirect('dashboard')
+            return redirect('portal-membro')
+        return render(request, 'portal_login.html')
+
+    def post(self, request):
+        username_or_email = request.POST.get('email')
+        password = request.POST.get('cpf')
+
+        # Tenta autenticar diretamente (Django auth para o admin)
+        user = authenticate(request, username=username_or_email, password=password)
+        
+        # Se falhou, tenta buscar pelo email do membro
+        if user is None:
+            try:
+                membro = Membro.objects.get(email=username_or_email)
+                if membro.user:
+                    user = authenticate(request, username=membro.user.username, password=password)
+            except Membro.DoesNotExist:
+                pass
+
+        if user is not None:
+            login(request, user)
+            if user.is_staff:
+                return redirect('dashboard')
+            return redirect('portal-membro')
+        else:
+            messages.error(request, "E-mail ou CPF incorretos.")
+        
+        return render(request, 'portal_login.html')
+
+class PortalLogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('portal-login')
+
+class PortalMembroView(LoginRequiredMixin, View):
+    def get(self, request):
+        # Se for admin tentando acessar o portal, redireciona pro dashboard ou deixa ver?
+        # Geralmente admin não tem objeto Membro vinculado.
+        try:
+            membro = Membro.objects.get(user=request.user)
+        except Membro.DoesNotExist:
+            if request.user.is_staff:
+                return redirect('dashboard')
+            messages.error(request, "Seu usuário não possui um perfil de membro vinculado.")
+            logout(request)
+            return redirect('portal-login')
+        
+        # Empréstimos atuais (não devolvidos)
+        emprestimos_ativos = Emprestimo.objects.filter(membro=membro, devolvido=False).select_related('livro')
+        
+        # Histórico completo (devolvidos)
+        historico = Emprestimo.objects.filter(membro=membro, devolvido=True).select_related('livro').order_by('-data_devolucao')
+        
+        # Reservas Ativas
+        reservas = Reserva.objects.filter(membro=membro, status=Reserva.Status.ATIVA).select_related('livro')
+        reservas_livros = [r.livro for r in reservas]
+        
+        multas = Multa.objects.filter(emprestimo__membro=membro, pago=False)
+        todos_livros = Livro.objects.all().order_by('titulo')
+
+        # Lógica de Recomendação: "Quem leu este, também leu..."
+        # 1. Pega os IDs dos livros que o membro já leu ou está lendo
+        livros_lidos_ids = Emprestimo.objects.filter(membro=membro).values_list('livro_id', flat=True)
+        
+        # 2. Encontra outros membros que leram esses mesmos livros
+        outros_membros_ids = Emprestimo.objects.filter(
+            livro_id__in=livros_lidos_ids
+        ).exclude(membro=membro).values_list('membro_id', flat=True).distinct()
+        
+        # 3. Encontra livros que esses outros membros leram, mas que o membro atual ainda não leu
+        recomendacoes = Livro.objects.filter(
+            emprestimos__membro_id__in=outros_membros_ids
+        ).exclude(
+            id__in=livros_lidos_ids
+        ).annotate(
+            contagem=Count('id')
+        ).order_by('-contagem')[:4]
+
+        # Fallback: Se não houver recomendações baseadas em outros usuários, sugere livros aleatórios
+        if not recomendacoes:
+            recomendacoes = Livro.objects.exclude(id__in=livros_lidos_ids).order_by('?')[:4]
+        
+        context = {
+            'membro': membro,
+            'emprestimos': emprestimos_ativos,
+            'historico': historico,
+            'reservas': reservas,
+            'reservas_livros': reservas_livros,
+            'multas': multas,
+            'todos_livros': todos_livros,
+            'recomendacoes': recomendacoes,
+        }
+        return render(request, 'portal_membro.html', context)
+
+class LivroUpdateTemplateView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def get(self, request, pk):
+        livro = get_object_or_404(Livro, pk=pk)
+        form = LivroForm(instance=livro)
+        return render(request, 'livro_form.html', {'form': form, 'titulo': f'Editar: {livro.titulo}'})
+
+    def post(self, request, pk):
+        livro = get_object_or_404(Livro, pk=pk)
+        form = LivroForm(request.POST, instance=livro)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Livro '{livro.titulo}' atualizado com sucesso!")
+            return redirect('livros')
+        return render(request, 'livro_form.html', {'form': form, 'titulo': f'Editar: {livro.titulo}'})
+
+class LivroDetailTemplateView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def get(self, request, pk):
+        livro = get_object_or_404(Livro, pk=pk)
+        emprestimos_ativos = Emprestimo.objects.filter(livro=livro, devolvido=False).select_related('membro')
+        reservas_ativas = Reserva.objects.filter(livro=livro, status=Reserva.Status.ATIVA).select_related('membro').order_by('data_reserva')
+        disponiveis = max(livro.exemplares - emprestimos_ativos.count(), 0)
+        return render(request, 'livro_detalhe.html', {
+            'livro': livro, 
+            'emprestimos': emprestimos_ativos,
+            'reservas': reservas_ativas,
+            'disponiveis': disponiveis
+        })
+
+class DevolverLivroView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def post(self, request, pk):
+        emprestimo = get_object_or_404(Emprestimo, pk=pk)
+        emprestimo.devolvido = True
+        emprestimo.save()
+        messages.success(request, f"O livro '{emprestimo.livro.titulo}' foi marcado como devolvido com sucesso!")
+        return redirect('dashboard')
+
+class AlternarStatusMembroView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def post(self, request, pk):
+        membro = get_object_or_404(Membro, pk=pk)
+        membro.ativo = not membro.ativo
+        membro.save()
+        status = "ativado" if membro.ativo else "desativado"
+        messages.success(request, f"O membro {membro.nome} foi {status} com sucesso!")
+        return redirect('membros')
+
+class DashboardTemplateView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect('portal-membro')
+        return redirect('portal-login')
+
     def get(self, request):
         hoje = date.today()
         semana_atras = hoje - timedelta(days=7)
@@ -70,7 +315,9 @@ class RankingTemplateView(View):
 
 class LivrosTemplateView(View):
     def get(self, request):
-        livros = Livro.objects.select_related('editora').all()
+        livros = Livro.objects.select_related('editora').annotate(
+            emprestimos_ativos_count=Count('emprestimos', filter=Q(emprestimos__devolvido=False))
+        ).all()
         return render(request, 'livros.html', {'livros': livros})
 
 class EditorasTemplateView(View):

@@ -23,6 +23,11 @@
     <div class="stat-label">Multas em Aberto</div>
     <div class="stat-value" style="color: var(--accent)">R$ {{ multas_valor_total }}</div>
     <div class="stat-sub">{{ multas_count }} multas pendentes</div>
+    <div style="margin-top: 10px;">
+      <a href="{% url 'exportar-csv' %}" class="btn btn-primary btn-sm" style="text-decoration: none; font-size: 11px; padding: 4px 8px;">
+        Exportar CSV
+      </a>
+    </div>
   </div>
 </div>
 
@@ -74,10 +79,16 @@
           <td>
             {% if emprestimo.devolvido %}
               <span class="badge badge-ok">Devolvido</span>
-            {% elif emprestimo.esta_atrasado %}
-              <span class="badge badge-out">Atrasado</span>
             {% else %}
-              <span class="badge badge-ok">Em dia</span>
+              <form action="{% url 'devolver-livro' emprestimo.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline btn-sm" style="font-size: 10px; padding: 2px 5px;">Baixar</button>
+              </form>
+              {% if emprestimo.esta_atrasado %}
+                <span class="badge badge-out">Atrasado</span>
+              {% else %}
+                <span class="badge badge-ok">Em dia</span>
+              {% endif %}
             {% endif %}
           </td>
         </tr>

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Livro, Estante, Editora, Membro, Emprestimo, Multa
+from .models import Livro, Estante, Editora, Membro, Emprestimo, Multa, Reserva
 
 
 class EditoraSerializer(serializers.ModelSerializer):
@@ -51,4 +51,13 @@ class MultaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Multa
+        fields = '__all__'
+
+
+class ReservaSerializer(serializers.ModelSerializer):
+    membro_nome = serializers.CharField(source='membro.nome', read_only=True)
+    livro_titulo = serializers.CharField(source='livro.titulo', read_only=True)
+
+    class Meta:
+        model = Reserva
         fields = '__all__'

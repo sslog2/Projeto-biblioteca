@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 class Editora(models.Model):
@@ -20,6 +21,7 @@ class Livro(models.Model):
     editora = models.ForeignKey(
         Editora, on_delete=models.SET_NULL, null=True, blank=True, related_name='livros'
     )
+    exemplares = models.PositiveIntegerField(default=1)
     data_cadastro = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -36,8 +38,11 @@ class Estante(models.Model):
 
 
 class Membro(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='membro', null=True, blank=True)
     nome = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
+    cpf = models.CharField(max_length=14, blank=True)
+    endereco = models.TextField(blank=True)
     telefone = models.CharField(max_length=20, blank=True)
     ativo = models.BooleanField(default=True)
     data_cadastro = models.DateTimeField(default=timezone.now)
@@ -72,7 +77,9 @@ class Emprestimo(models.Model):
     @property
     def esta_atrasado(self):
         from datetime import date
-        return not self.devolvido and self.data_devolucao < date.today()
+        if self.devolvido:
+            return False
+        return self.data_devolucao < date.today()
 
     @property
     def dias_atraso(self):
@@ -92,3 +99,18 @@ class Multa(models.Model):
 
     def __str__(self):
         return f"R$ {self.valor} — {self.emprestimo.membro.nome}"
+
+
+class Reserva(models.Model):
+    class Status(models.TextChoices):
+        ATIVA = 'ativa', 'Ativa'
+        CANCELADA = 'cancelada', 'Cancelada'
+        ATENDIDA = 'atendida', 'Atendida'
+
+    membro = models.ForeignKey(Membro, on_delete=models.CASCADE, related_name='reservas')
+    livro = models.ForeignKey(Livro, on_delete=models.CASCADE, related_name='reservas')
+    data_reserva = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.ATIVA)
+
+    def __str__(self):
+        return f"Reserva: {self.membro.nome} — {self.livro.titulo}"

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Livro{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+    
+    <!-- Coluna 1: Informações do Livro -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Informações Gerais</h3>
+        </div>
+        <div class="card-body">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="book-cover" style="width: 120px; height: 160px; font-size: 32px; margin: 0 auto; background: var(--accent);">
+                    {{ livro.titulo|slice:":2"|upper }}
+                </div>
+                <h2 style="margin: 15px 0 5px 0;">{{ livro.titulo }}</h2>
+                <p style="color: #666;">{{ livro.autor }}</p>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            
+            <p><strong>ISBN:</strong> {{ livro.isbn }}</p>
+            <p><strong>Editora:</strong> {{ livro.editora.nome|default:"Não informada" }}</p>
+            <p><strong>Ano:</strong> {{ livro.ano_publicacao }}</p>
+            <p><strong>Páginas:</strong> {{ livro.paginas }}</p>
+            <p><strong>Estoque Total:</strong> {{ livro.exemplares }} unidades</p>
+            
+            <div style="margin-top: 25px;">
+                <a href="{% url 'livro-edit' livro.id %}" class="btn btn-primary" style="width: 100%; text-decoration: none; display: block; text-align: center;">Editar Livro</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coluna 2: Quem está com o livro -->
+    <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title">Leitores Atuais</h3>
+            <span class="badge {% if disponiveis > 0 %}badge-ok{% else %}badge-out{% endif %}">
+                Disponível: {{ disponiveis }}
+            </span>
+        </div>
+        <div class="card-body">
+            {% if emprestimos %}
+                <p style="margin-bottom: 15px; color: #666;">Membros que estão com este livro no momento:</p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                            <th style="padding: 10px;">Membro</th>
+                            <th style="padding: 10px;">Devolução</th>
+                            <th style="padding: 10px;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in emprestimos %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div class="avatar">{{ emp.membro.iniciais }}</div>
+                                        {{ emp.membro.nome }}
+                                    </div>
+                                </td>
+                                <td style="padding: 10px;">
+                                    {{ emp.data_devolucao }}
+                                    {% if emp.esta_atrasado %}
+                                        <br><span style="color: #dc3545; font-size: 11px; font-weight: bold;">Atrasado!</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 10px;">
+                                    <form action="{% url 'devolver-livro' emp.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline btn-sm">Dar Baixa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <span class="icon" style="font-size: 40px; display: block; margin-bottom: 10px;"></span>
+                    Este livro não possui nenhum empréstimo ativo no momento.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Coluna 2 - Parte B: Fila de Reserva -->
+    <div class="card" style="margin-top: 20px; border-left: 5px solid #ffc107;">
+        <div class="card-header">
+            <h3 class="card-title">Fila de Reserva</h3>
+        </div>
+        <div class="card-body">
+            {% if reservas %}
+                <p style="margin-bottom: 15px; color: #666;">Membros aguardando este livro (por ordem de pedido):</p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                            <th style="padding: 10px;">Membro</th>
+                            <th style="padding: 10px;">Data do Pedido</th>
+                            <th style="padding: 10px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in reservas %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div class="avatar" style="background: #fff3cd; color: #856404;">{{ res.membro.iniciais }}</div>
+                                        {{ res.membro.nome }}
+                                    </div>
+                                </td>
+                                <td style="padding: 10px;">{{ res.data_reserva|date:"d/m/Y H:i" }}</td>
+                                <td style="padding: 10px;">
+                                    <span class="badge" style="background: #fff3cd; color: #856404; font-size: 11px;">Aguardando</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: #999; text-align: center; padding: 20px;">Nenhuma reserva ativa para este livro.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

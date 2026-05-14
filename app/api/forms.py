@@ -4,7 +4,7 @@ from .models import Livro, Membro, Editora, Emprestimo
 class LivroForm(forms.ModelForm):
     class Meta:
         model = Livro
-        fields = ['titulo', 'autor', 'isbn', 'paginas', 'ano_publicacao', 'editora']
+        fields = ['titulo', 'autor', 'isbn', 'paginas', 'ano_publicacao', 'editora', 'exemplares']
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Livro'}),
             'autor': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do Autor'}),
@@ -12,6 +12,7 @@ class LivroForm(forms.ModelForm):
             'paginas': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de Páginas'}),
             'ano_publicacao': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ano de Publicação'}),
             'editora': forms.Select(attrs={'class': 'form-control'}),
+            'exemplares': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Quantidade de exemplares'}),
         }
 
 class MembroForm(forms.ModelForm):

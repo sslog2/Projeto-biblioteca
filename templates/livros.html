@@ -65,16 +65,21 @@
           <td>{{ livro.ano_publicacao|default:"-" }}</td>
           <td>{{ livro.exemplares|default:"1" }}</td>
           <td>
-            {% if livro.exemplares > 0 %}
+            {% if livro.exemplares > livro.emprestimos_ativos_count %}
               <span class="badge badge-ok">Disponível</span>
             {% else %}
               <span class="badge badge-out">Esgotado</span>
             {% endif %}
           </td>
           <td>
-            <button class="btn btn-ghost" style="font-size: 12px">
-              Editar
-            </button>
+            <div style="display: flex; gap: 5px;">
+              <a href="{% url 'livro-detail' livro.id %}" class="btn btn-ghost" style="font-size: 12px; text-decoration: none;">
+                Ver
+              </a>
+              <a href="{% url 'livro-edit' livro.id %}" class="btn btn-outline" style="font-size: 12px; text-decoration: none; padding: 2px 8px;">
+                Editar
+              </a>
+            </div>
           </td>
         </tr>
         {% empty %}

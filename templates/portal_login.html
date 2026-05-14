@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Acesso ao Portal do Membro{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 20px; text-align: center;">Identificação</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px;">E-mail ou Usuário</label>
+            <input type="text" name="email" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px;">Senha (CPF)</label>
+            <input type="password" name="cpf" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            <small style="color: #666;">Para o protótipo, use seu CPF como senha.</small>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar no Portal</button>
+    </form>
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; font-size: 14px;">← Voltar ao Sistema Admin</a>
+    </div>
+</div>
+{% endblock %}
