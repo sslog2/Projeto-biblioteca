@@ -17,10 +17,14 @@
         <p style="margin-bottom: 16px; font-size: 0.9rem; color: var(--muted)">
           Abaixo estão os livros com devolução pendente.
         </p>
-        <div class="form-group">
-          <label>Valor da multa por dia (R$)</label>
-          <input type="number" id="valorDia" value="1.50" step="0.10" style="width: 100%" onchange="recalculateAll()">
-        </div>
+        <form method="post" style="display: flex; flex-direction: column; gap: 12px;">
+          {% csrf_token %}
+          <div class="form-group">
+            <label>Valor da multa por dia (R$)</label>
+            <input type="number" id="valorDia" name="valor_dia" value="{{ valor_dia }}" step="any" min="0.01" style="width: 100%" oninput="recalculateAll()">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Salvar Valor</button>
+        </form>
       </div>
     </div>
 
@@ -60,7 +64,7 @@
     });
   }
   
-  // Inicializa o cálculo
+  // Inicializa o cálculo com o valor salvo
   window.onload = recalculateAll;
 </script>
 {% endblock %}

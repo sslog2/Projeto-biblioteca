@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from decimal import Decimal
 
 
 class Editora(models.Model):
@@ -26,15 +27,6 @@ class Livro(models.Model):
 
     def __str__(self):
         return self.titulo
-
-
-class Estante(models.Model):
-    nome = models.CharField(max_length=200)
-    descricao = models.TextField(blank=True)
-    livros = models.ManyToManyField(Livro, related_name='estantes', blank=True)
-
-    def __str__(self):
-        return self.nome
 
 
 class Membro(models.Model):
@@ -114,3 +106,21 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"Reserva: {self.membro.nome} — {self.livro.titulo}"
+
+
+class Configuracao(models.Model):
+    valor_multa_dia = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('1.50'))
+
+    class Meta:
+        verbose_name = 'Configuração do Sistema'
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_instance(cls):
+        return cls.objects.first() or cls.objects.create()
+
+    def __str__(self):
+        return f"Configuração do Sistema"

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Conta — Portal do Membro{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 40px auto; padding: 28px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <h3 style="margin-bottom: 6px; text-align: center;">Criar Conta</h3>
+  <p style="text-align:center; font-size:13px; color:#7a6e5f; margin-bottom:24px;">Preencha os dados para acessar o portal</p>
+
+  {% if erros %}
+  <div style="background:#fef2f2; border:1px solid #fca5a5; border-radius:4px; padding:12px; margin-bottom:18px;">
+    {% for e in erros %}
+    <p style="color:#c0392b; font-size:13px; margin:0 0 4px 0;">• {{ e }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block; margin-bottom:5px; font-size:14px; font-weight:500;">Nome completo</label>
+      <input type="text" name="nome" value="{{ dados.nome|default:'' }}" required
+             style="width:100%; padding:9px 12px; border:1px solid #e0d8cc; border-radius:4px; font-size:14px;">
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block; margin-bottom:5px; font-size:14px; font-weight:500;">E-mail</label>
+      <input type="email" name="email" value="{{ dados.email|default:'' }}" required
+             style="width:100%; padding:9px 12px; border:1px solid #e0d8cc; border-radius:4px; font-size:14px;">
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block; margin-bottom:5px; font-size:14px; font-weight:500;">CPF <span style="color:#7a6e5f; font-weight:400;">(será usado como senha)</span></label>
+      <input type="text" name="cpf" value="{{ dados.cpf|default:'' }}" required
+             placeholder="000.000.000-00"
+             style="width:100%; padding:9px 12px; border:1px solid #e0d8cc; border-radius:4px; font-size:14px;">
+    </div>
+
+    <div style="margin-bottom:22px;">
+      <label style="display:block; margin-bottom:5px; font-size:14px; font-weight:500;">Telefone <span style="color:#7a6e5f; font-weight:400;">(opcional)</span></label>
+      <input type="text" name="telefone" value="{{ dados.telefone|default:'' }}"
+             style="width:100%; padding:9px 12px; border:1px solid #e0d8cc; border-radius:4px; font-size:14px;">
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%; padding:11px;">Criar Conta</button>
+  </form>
+
+  <div style="margin-top:18px; text-align:center;">
+    <a href="{% url 'portal-login' %}" style="color:#7a6e5f; text-decoration:none; font-size:13px;">← Já tenho conta, entrar</a>
+  </div>
+</div>
+{% endblock %}

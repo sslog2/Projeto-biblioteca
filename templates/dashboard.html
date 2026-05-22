@@ -20,9 +20,14 @@
     <div class="stat-sub">{{ proximos_vencimento }} próximos do vencimento</div>
   </div>
   <div class="stat-card">
+    <div class="stat-label">Reservas Ativas</div>
+    <div class="stat-value">{{ reservas_count }}</div>
+    <div class="stat-sub">aguardando disponibilidade</div>
+  </div>
+  <div class="stat-card">
     <div class="stat-label">Multas em Aberto</div>
     <div class="stat-value" style="color: var(--accent)">R$ {{ multas_valor_total }}</div>
-    <div class="stat-sub">{{ multas_count }} multas pendentes</div>
+    <div class="stat-sub">{{ multas_count }} membro{% if multas_count != 1 %}s{% endif %} inadimplente{% if multas_count != 1 %}s{% endif %}</div>
     <div style="margin-top: 10px;">
       <a href="{% url 'exportar-csv' %}" class="btn btn-primary btn-sm" style="text-decoration: none; font-size: 11px; padding: 4px 8px;">
         Exportar CSV
@@ -54,7 +59,7 @@
   <div class="card">
     <div class="card-header">
       <div class="card-title">Empréstimos Recentes</div>
-      <span class="section-meta">Geral</span>
+      <a href="{% url 'emprestimos' %}" style="font-size: 13px; color: var(--accent); text-decoration: none;">Ver todos →</a>
     </div>
     <table>
       <thead>
@@ -100,5 +105,41 @@
       </tbody>
     </table>
   </div>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+  <div class="card-header">
+    <div class="card-title">Reservas Ativas</div>
+    <span class="section-meta">{{ reservas_count }} no total</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Membro</th>
+        <th>Livro</th>
+        <th>Data Reserva</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reserva in reservas_ativas %}
+      <tr>
+        <td>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <div class="avatar">{{ reserva.membro.iniciais }}</div>
+            {{ reserva.membro.nome }}
+          </div>
+        </td>
+        <td>{{ reserva.livro.titulo }}</td>
+        <td>{{ reserva.data_reserva|date:"d/m/Y" }}</td>
+        <td><span class="badge badge-warn">Aguardando</span></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" style="text-align:center; padding: 1.5rem; color: var(--muted);">Nenhuma reserva ativa no momento.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

@@ -1,8 +1,8 @@
 from rest_framework import generics
-from .models import Livro, Estante, Editora, Membro, Emprestimo, Multa
+from .models import Livro, Editora, Membro, Emprestimo, Multa, Reserva
 from .serializers import (
-    LivroSerializer, EstanteSerializer, EditoraSerializer,
-    MembroSerializer, EmprestimoSerializer, MultaSerializer,
+    LivroSerializer, EditoraSerializer,
+    MembroSerializer, EmprestimoSerializer, MultaSerializer, ReservaSerializer,
 )
 
 class LivroListView(generics.ListAPIView):
@@ -28,32 +28,6 @@ class LivroUpdateView(generics.UpdateAPIView):
 class LivroDeleteView(generics.DestroyAPIView):
     queryset = Livro.objects.all()
     serializer_class = LivroSerializer
-
-#Estante Views
-
-class EstanteListView(generics.ListAPIView):
-    queryset = Estante.objects.all()
-    serializer_class = EstanteSerializer
-
-
-class EstanteDetailView(generics.RetrieveAPIView):
-    queryset = Estante.objects.all()
-    serializer_class = EstanteSerializer
-
-
-class EstanteCreateView(generics.CreateAPIView):
-    queryset = Estante.objects.all()
-    serializer_class = EstanteSerializer
-
-
-class EstanteUpdateView(generics.UpdateAPIView):
-    queryset = Estante.objects.all()
-    serializer_class = EstanteSerializer
-
-
-class EstanteDeleteView(generics.DestroyAPIView):
-    queryset = Estante.objects.all()
-    serializer_class = EstanteSerializer
 
 
 # Editora Views

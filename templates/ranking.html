@@ -40,12 +40,44 @@
     </div>
     <div class="card">
       <div class="card-header">
-        <div class="card-title">Legenda de Cores</div>
+        <div class="card-title">Mais Reservados</div>
+        <span class="section-meta">Reservas ativas</span>
       </div>
-      <p style="padding: 1rem; color: var(--muted); font-size: 0.9rem;">
-        Os destaques em <strong>Dourado</strong> representam o Top 3 da semana.
-      </p>
+      {% for livro in ranking_reservas %}
+      <div class="rank-item">
+        <div class="rank-num {% if forloop.counter <= 3 %}top{% endif %}">{{ forloop.counter }}</div>
+        <div
+          class="book-cover"
+          style="background: var(--accent); width: 32px; height: 44px"
+        >
+          {{ livro.titulo|slice:":2"|upper }}
+        </div>
+        <div class="rank-bar-wrap">
+          <div class="book-title" style="font-size: 14px">{{ livro.titulo }}</div>
+          <div
+            class="book-author"
+            style="font-size: 12px; color: var(--muted)"
+          >
+            {{ livro.autor }} · {{ livro.total_reservas }} reserva{{ livro.total_reservas|pluralize }}
+          </div>
+          <div class="rank-bar-bg">
+            <div class="rank-bar" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p style="padding: 1rem; color: var(--muted);">Nenhuma reserva ativa no momento.</p>
+      {% endfor %}
     </div>
+  </div>
+
+  <div class="card" style="margin-top: 20px; max-width: 400px;">
+    <div class="card-header">
+      <div class="card-title">Legenda de Cores</div>
+    </div>
+    <p style="padding: 1rem; color: var(--muted); font-size: 0.9rem;">
+      Os destaques em <strong>Dourado</strong> representam o Top 3 da semana.
+    </p>
   </div>
 </div>
 {% endblock %}

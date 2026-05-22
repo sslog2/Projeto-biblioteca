@@ -99,10 +99,11 @@ body {
   color: white;
 }
 .nav-item .icon {
-  font-family: "Symbols Nerd Font", "Inter", sans-serif;
-  font-size: 18px;
-  width: 20px;
-  text-align: center;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  opacity: 0.85;
 }
 
 .sidebar-footer {

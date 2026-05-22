@@ -147,7 +147,7 @@ Acesse em: **http://localhost:8000/**
 
 ## Populando o Banco de Dados
 
-O comando `popular_db` insere dados de demonstração incluindo editoras, livros, estantes, membros, empréstimos e multas:
+O comando `popular_db` insere dados de demonstração incluindo editoras, livros, membros, empréstimos e multas:
 
 ```bash
 python manage.py popular_db
@@ -176,7 +176,7 @@ Cada recurso possui 5 endpoints:
 | `PUT/PATCH` | `/api/{recurso}/<id>/atualizar/`     | Atualizar |
 | `DELETE`    | `/api/{recurso}/<id>/deletar/`       | Deletar   |
 
-**Recursos disponíveis:** `livros`, `estantes`, `editoras`, `membros`, `emprestimos`, `multas`
+**Recursos disponíveis:** `livros`, `editoras`, `membros`, `emprestimos`, `multas`
 
 ### Utilitários — `/api/utils/`
 

@@ -152,11 +152,17 @@
                 <h3 class="card-title">Pendências Financeiras</h3>
             </div>
             <div class="card-body">
-                {% if multas %}
+                {% if multas or pendencias_dinamicas %}
                     {% for multa in multas %}
                         <div style="padding: 10px; background: #fff5f5; border-radius: 4px; margin-bottom: 10px;">
                             <p style="margin: 0; font-weight: bold; color: #721c24;">R$ {{ multa.valor }}</p>
                             <small style="color: #666;">Referente ao livro: {{ multa.emprestimo.livro.titulo }}</small>
+                        </div>
+                    {% endfor %}
+                    {% for p in pendencias_dinamicas %}
+                        <div style="padding: 10px; background: #fff5f5; border-radius: 4px; margin-bottom: 10px;">
+                            <p style="margin: 0; font-weight: bold; color: #721c24;">R$ {{ p.valor }}</p>
+                            <small style="color: #666;">{{ p.livro_titulo }} — {{ p.dias }} dia{{ p.dias|pluralize }} de atraso</small>
                         </div>
                     {% endfor %}
                 {% else %}

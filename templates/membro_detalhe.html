@@ -86,5 +86,47 @@
       </table>
     </div>
   </div>
+
+  <!-- Reservas do Membro -->
+  <div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+      <div class="card-title">Reservas</div>
+    </div>
+    <table style="width: 100%;">
+      <thead>
+        <tr>
+          <th>Livro</th>
+          <th>Data Reserva</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reserva in reservas %}
+        <tr>
+          <td>
+            <div style="font-weight: 500;">{{ reserva.livro.titulo }}</div>
+            <div style="font-size: 12px; color: var(--muted);">{{ reserva.livro.autor }}</div>
+          </td>
+          <td>{{ reserva.data_reserva|date:"d/m/Y" }}</td>
+          <td>
+            {% if reserva.status == 'ativa' %}
+              <span class="badge badge-warn">Aguardando</span>
+            {% elif reserva.status == 'atendida' %}
+              <span class="badge badge-ok">Atendida</span>
+            {% else %}
+              <span class="badge">Cancelada</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" style="text-align: center; padding: 2rem; color: var(--muted);">
+            Nenhuma reserva registrada para este membro.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

@@ -1,5 +1,6 @@
+from datetime import date, timedelta
 from rest_framework import serializers
-from .models import Livro, Estante, Editora, Membro, Emprestimo, Multa, Reserva
+from .models import Livro, Editora, Membro, Emprestimo, Multa, Reserva
 
 
 class EditoraSerializer(serializers.ModelSerializer):
@@ -16,17 +17,6 @@ class LivroSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EstanteSerializer(serializers.ModelSerializer):
-    livros_detalhes = LivroSerializer(source='livros', many=True, read_only=True)
-    livros = serializers.PrimaryKeyRelatedField(
-        queryset=Livro.objects.all(), many=True, required=False
-    )
-
-    class Meta:
-        model = Estante
-        fields = '__all__'
-
-
 class MembroSerializer(serializers.ModelSerializer):
     iniciais = serializers.ReadOnlyField()
 
@@ -39,10 +29,21 @@ class EmprestimoSerializer(serializers.ModelSerializer):
     membro_nome = serializers.CharField(source='membro.nome', read_only=True)
     membro_iniciais = serializers.CharField(source='membro.iniciais', read_only=True)
     livro_titulo = serializers.CharField(source='livro.titulo', read_only=True)
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = Emprestimo
         fields = '__all__'
+
+    def get_status(self, obj):
+        if obj.devolvido:
+            return 'devolvido'
+        hoje = date.today()
+        if obj.data_devolucao < hoje:
+            return 'atrasado'
+        if obj.data_devolucao <= hoje + timedelta(days=3):
+            return 'vencendo'
+        return 'em_dia'
 
 
 class MultaSerializer(serializers.ModelSerializer):
