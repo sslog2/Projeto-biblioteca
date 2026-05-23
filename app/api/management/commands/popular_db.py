@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from app.api.models import Editora, Livro, Estante, Membro, Emprestimo, Multa
+from app.api.models import Editora, Livro, Membro, Emprestimo, Multa
 
 
 class Command(BaseCommand):
@@ -16,7 +16,6 @@ class Command(BaseCommand):
         Emprestimo.objects.all().delete()
         Membro.objects.all().delete()
         Livro.objects.all().delete()
-        Estante.objects.all().delete()
         Editora.objects.all().delete()
 
         # ── Editoras ──
@@ -75,34 +74,6 @@ class Command(BaseCommand):
                 ano_publicacao=ano,
                 editora=editoras[ed_key],
             )
-
-        # ── Estantes ──
-        self.stdout.write('Criando estantes...')
-        estante_lit_br = Estante.objects.create(
-            nome='Literatura Brasileira',
-            descricao='Clássicos da literatura nacional',
-        )
-        estante_lit_br.livros.add(
-            livros['Dom Casmurro'],
-            livros['A Hora da Estrela'],
-            livros['Memórias Póstumas de Brás Cubas'],
-            livros['Grande Sertão: Veredas'],
-            livros['Vidas Secas'],
-            livros['O Cortiço'],
-        )
-
-        estante_lit_int = Estante.objects.create(
-            nome='Literatura Internacional',
-            descricao='Obras estrangeiras traduzidas',
-        )
-        estante_lit_int.livros.add(
-            livros['Cem Anos de Solidão'],
-            livros['1984'],
-            livros['Crime e Castigo'],
-            livros['Madame Bovary'],
-            livros['O Grande Gatsby'],
-            livros['O Pequeno Príncipe'],
-        )
 
         # ── Membros ──
         self.stdout.write('Criando membros...')
@@ -201,7 +172,6 @@ class Command(BaseCommand):
             f'Banco populado com sucesso!\n'
             f'  {Editora.objects.count()} editoras\n'
             f'  {Livro.objects.count()} livros\n'
-            f'  {Estante.objects.count()} estantes\n'
             f'  {Membro.objects.count()} membros\n'
             f'  {Emprestimo.objects.count()} empréstimos\n'
             f'  {Multa.objects.count()} multas'

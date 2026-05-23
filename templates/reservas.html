@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Reservas{% endblock %}
+
+{% block content %}
+<div class="page active">
+
+  {% if messages %}
+  <div style="margin-bottom: 1.5rem;">
+    {% for message in messages %}
+    <div style="padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem;
+      background: {% if message.tags == 'error' %}#fee2e2{% elif message.tags == 'success' %}#d1fae5{% else %}#fef9c3{% endif %};
+      color: {% if message.tags == 'error' %}#991b1b{% elif message.tags == 'success' %}#065f46{% else %}#92400e{% endif %};
+      font-size: 14px;">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">
+      <span>Reservas Ativas</span>
+      <span style="font-size: 14px; color: var(--text-muted);">{{ reservas_info|length }} no total</span>
+    </div>
+
+    {% if reservas_info %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Membro</th>
+          <th>Livro</th>
+          <th>Data Reserva</th>
+          <th>Disponibilidade</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in reservas_info %}
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white;
+                          display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0;">
+                {{ item.reserva.membro.iniciais }}
+              </div>
+              <span>{{ item.reserva.membro.nome }}</span>
+            </div>
+          </td>
+          <td>{{ item.reserva.livro.titulo }}</td>
+          <td>{{ item.reserva.data_reserva|date:"d/m/Y" }}</td>
+          <td>
+            {% if item.disponivel %}
+              <span class="badge badge-success">Disponível</span>
+            {% else %}
+              <span class="badge badge-warning">Indisponível</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              {% if item.disponivel %}
+              <button onclick="abrirModal({{ item.reserva.pk }}, '{{ item.reserva.membro.nome|escapejs }}', '{{ item.reserva.livro.titulo|escapejs }}')"
+                      class="btn btn-primary btn-sm">
+                Aprovar Empréstimo
+              </button>
+              {% else %}
+              <button disabled class="btn btn-sm"
+                      style="opacity: 0.5; cursor: not-allowed; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted);">
+                Sem exemplar
+              </button>
+              {% endif %}
+              <form method="post" action="{% url 'cancelar-reserva-admin' item.reserva.pk %}"
+                    onsubmit="return confirm('Cancelar a reserva de {{ item.reserva.membro.nome|escapejs }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm"
+                        style="background: #fee2e2; color: #991b1b; border: none;">
+                  Cancelar
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+      <i data-lucide="bookmark-x" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.4;"></i>
+      <p style="font-size: 16px;">Nenhuma reserva ativa no momento.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal de Aprovação -->
+<div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background: #fff; border-radius: 20px; padding: 0; max-width: 480px; width: 92%; box-shadow: 0 24px 80px rgba(0,0,0,0.25); overflow: hidden; animation: modalIn 0.2s ease;">
+
+    <!-- Cabeçalho colorido -->
+    <div style="background: #c0392b; padding: 1.5rem 1.75rem; position: relative;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="background: rgba(255,255,255,0.2); border-radius: 10px; padding: 0.5rem; display: flex;">
+          <i data-lucide="book-open" style="width: 22px; height: 22px; color: white;"></i>
+        </div>
+        <div>
+          <h3 style="margin: 0; color: white; font-size: 17px; font-family: var(--serif);">Aprovar Empréstimo</h3>
+          <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 13px;" id="modal-desc"></p>
+        </div>
+      </div>
+      <button onclick="fecharModal()" style="position:absolute; top:1rem; right:1rem; background:rgba(255,255,255,0.2); border:none; border-radius:8px; padding:0.4rem 0.5rem; cursor:pointer; color:white; display:flex; align-items:center; line-height:1;">
+        <i data-lucide="x" style="width:16px; height:16px;"></i>
+      </button>
+    </div>
+
+    <!-- Corpo -->
+    <div style="padding: 1.75rem; background: #fff;">
+      <form method="post" id="modal-form" action="">
+        {% csrf_token %}
+
+        <label style="display:block; margin-bottom: 0.5rem; font-weight: 600; font-size: 12px; color: #7a6e5f; text-transform: uppercase; letter-spacing: 0.06em;">
+          Data de Devolução
+        </label>
+        <input type="date" name="data_devolucao" id="data_devolucao" min="{{ hoje }}"
+               style="width: 100%; padding: 0.8rem 1rem; border: 1.5px solid #e0d8cc; border-radius: 10px;
+                      background: #fff; color: #1a1208; font-size: 15px; box-sizing: border-box;
+                      transition: border-color 0.2s;" required
+               onfocus="this.style.borderColor='#c0392b'" onblur="this.style.borderColor='#e0d8cc'">
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" onclick="fecharModal()"
+                  style="flex: 1; height: 44px; background: transparent; border: 1px solid #e0d8cc; border-radius: var(--radius); color: #7a6e5f; font-size: 14px; cursor: pointer; font-family: inherit;">
+            Cancelar
+          </button>
+          <button type="submit"
+                  style="flex: 2; height: 44px; background: #c0392b; border: none; border-radius: var(--radius); color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;">
+            Confirmar Empréstimo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>
+
+<script>
+  function abrirModal(pk, membro, livro) {
+    document.getElementById('modal-desc').textContent = membro + ' — ' + livro;
+    document.getElementById('modal-form').action = '/reservas/aprovar/' + pk + '/';
+    document.getElementById('modal-overlay').style.display = 'flex';
+    lucide.createIcons();
+  }
+
+  function fecharModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+  }
+
+  document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) fecharModal();
+  });
+</script>
+{% endblock %}

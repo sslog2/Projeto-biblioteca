@@ -55,12 +55,12 @@
           </td>
           <td>
             <div style="display: flex; gap: 5px;">
-              <a href="{% url 'membro-detail' membro.id %}" class="btn btn-ghost" style="font-size: 12px; text-decoration: none;">
+              <a href="{% url 'membro-detail' membro.id %}" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 2px 8px; text-decoration: none;">
                 Ver
               </a>
               <form action="{% url 'membro-status' membro.id %}" method="post" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn {% if membro.ativo %}btn-outline{% else %}btn-primary{% endif %} btn-sm" style="font-size: 11px; padding: 2px 8px;">
+                <button type="submit" class="btn btn-sm" style="font-size: 11px; padding: 2px 8px; {% if membro.ativo %}background:#fee2e2;color:#991b1b;border:none;{% else %}background:#d4edda;color:#155724;border:none;{% endif %}">
                   {% if membro.ativo %}Desativar{% else %}Ativar{% endif %}
                 </button>
               </form>

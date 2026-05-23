@@ -31,8 +31,10 @@ from app.utils.views import (
     LivroCreateTemplateView,
     MembroCreateTemplateView,
     EmprestimoCreateTemplateView,
+    EmprestimosTemplateView,
     PortalLoginView,
     PortalLogoutView,
+    PortalCadastroView,
     PortalMembroView,
     RenovarEmprestimoView,
     ReservarLivroView,
@@ -40,7 +42,10 @@ from app.utils.views import (
     DevolverLivroView,
     AlternarStatusMembroView,
     LivroDetailTemplateView,
-    LivroUpdateTemplateView
+    LivroUpdateTemplateView,
+    ReservasTemplateView,
+    AprovarReservaView,
+    CancelarReservaAdminView,
 )
 
 schema_view = get_schema_view(
@@ -73,13 +78,18 @@ urlpatterns = [
     path('membros/', MembrosTemplateView.as_view(), name='membros'),
     path('membros/<int:pk>/', MembroDetalheTemplateView.as_view(), name='membro-detail'),
     path('membros/novo/', MembroCreateTemplateView.as_view(), name='membro-create'),
+    path('emprestimos/', EmprestimosTemplateView.as_view(), name='emprestimos'),
     path('emprestimos/novo/', EmprestimoCreateTemplateView.as_view(), name='emprestimo-create'),
+    path('reservas/', ReservasTemplateView.as_view(), name='reservas'),
+    path('reservas/aprovar/<int:pk>/', AprovarReservaView.as_view(), name='aprovar-reserva'),
+    path('reservas/cancelar/<int:pk>/', CancelarReservaAdminView.as_view(), name='cancelar-reserva-admin'),
     path('multa/', MultaTemplateView.as_view(), name='multa'),
     
     # Portal do Membro (N2)
     path('portal/', PortalMembroView.as_view(), name='portal-membro'),
     path('portal/login/', PortalLoginView.as_view(), name='portal-login'),
     path('portal/logout/', PortalLogoutView.as_view(), name='portal-logout'),
+    path('portal/cadastro/', PortalCadastroView.as_view(), name='portal-cadastro'),
     path('portal/renovar/<int:pk>/', RenovarEmprestimoView.as_view(), name='renovar-emprestimo'),
     path('portal/reservar/<int:pk>/', ReservarLivroView.as_view(), name='reservar-livro'),
 ]

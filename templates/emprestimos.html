@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Empréstimos{% endblock %}
+
+{% block content %}
+<div class="page active">
+
+  {% if messages %}
+  <div style="margin-bottom: 1.5rem;">
+    {% for message in messages %}
+    <div style="padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem;
+      background: {% if message.tags == 'error' %}#fee2e2{% elif message.tags == 'success' %}#d1fae5{% else %}#fef9c3{% endif %};
+      color: {% if message.tags == 'error' %}#991b1b{% elif message.tags == 'success' %}#065f46{% else %}#92400e{% endif %};
+      font-size: 14px;">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Filtros -->
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <a href="?filtro=todos" class="btn btn-sm {% if filtro == 'todos' %}btn-primary{% else %}btn-outline{% endif %}" style="text-decoration: none;">
+      Todos
+    </a>
+    <a href="?filtro=ativos" class="btn btn-sm {% if filtro == 'ativos' %}btn-primary{% else %}btn-outline{% endif %}" style="text-decoration: none;">
+      Ativos
+    </a>
+    <a href="?filtro=atrasados" class="btn btn-sm {% if filtro == 'atrasados' %}btn-primary{% else %}btn-outline{% endif %}" style="text-decoration: none;">
+      Atrasados
+    </a>
+    <a href="?filtro=devolvidos" class="btn btn-sm {% if filtro == 'devolvidos' %}btn-primary{% else %}btn-outline{% endif %}" style="text-decoration: none;">
+      Devolvidos
+    </a>
+    <span style="margin-left: auto; font-size: 13px; color: var(--text-muted); align-self: center;">
+      {{ total }} registro{% if total != 1 %}s{% endif %}
+    </span>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span>Empréstimos</span>
+      <span style="font-size: 13px; color: var(--text-muted);">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+      </span>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Membro</th>
+          <th>Livro</th>
+          <th>Empréstimo</th>
+          <th>Devolução</th>
+          <th>Status</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in page_obj %}
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="avatar">{{ emp.membro.iniciais }}</div>
+              {{ emp.membro.nome }}
+            </div>
+          </td>
+          <td>{{ emp.livro.titulo }}</td>
+          <td>{{ emp.data_emprestimo|date:"d/m/Y" }}</td>
+          <td>{{ emp.data_devolucao|date:"d/m/Y" }}</td>
+          <td>
+            {% if emp.devolvido %}
+              <span class="badge badge-ok">Devolvido</span>
+            {% elif emp.esta_atrasado %}
+              <span class="badge badge-out">Atrasado</span>
+            {% else %}
+              <span class="badge badge-ok">Em dia</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not emp.devolvido %}
+            <form action="{% url 'devolver-livro' emp.pk %}" method="post" style="display:inline;"
+                  onsubmit="return confirm('Confirmar devolução de \'{{ emp.livro.titulo|escapejs }}\'?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline btn-sm">Devolver</button>
+            </form>
+            {% else %}
+            <span style="color: var(--text-muted); font-size: 13px;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+            Nenhum empréstimo encontrado.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paginação -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 1.25rem; border-top: 1px solid var(--border);">
+      {% if page_obj.has_previous %}
+        <a href="?filtro={{ filtro }}&page=1" class="btn btn-outline btn-sm" style="text-decoration: none;">«</a>
+        <a href="?filtro={{ filtro }}&page={{ page_obj.previous_page_number }}" class="btn btn-outline btn-sm" style="text-decoration: none;">‹ Anterior</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          {% if num == page_obj.number %}
+            <span class="btn btn-primary btn-sm" style="min-width: 36px; text-align: center;">{{ num }}</span>
+          {% else %}
+            <a href="?filtro={{ filtro }}&page={{ num }}" class="btn btn-outline btn-sm" style="text-decoration: none; min-width: 36px; text-align: center;">{{ num }}</a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?filtro={{ filtro }}&page={{ page_obj.next_page_number }}" class="btn btn-outline btn-sm" style="text-decoration: none;">Próxima ›</a>
+        <a href="?filtro={{ filtro }}&page={{ page_obj.paginator.num_pages }}" class="btn btn-outline btn-sm" style="text-decoration: none;">»</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

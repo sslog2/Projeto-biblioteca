@@ -9,7 +9,6 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://www.nerdfonts.com/assets/css/nerd-fonts.css" />
     <link rel="stylesheet" href="{% static 'style.css' %}" />
     {% block extra_css %}{% endblock %}
   </head>
@@ -23,45 +22,48 @@
         {% if request.user.is_staff %}
             <div class="nav-section-label">Painel Admin</div>
             <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-              <span class="icon"></span> Visão Geral
+              <i data-lucide="layout-dashboard" class="icon"></i> Visão Geral
             </a>
 
             <div class="nav-section-label">Catálogo</div>
             <a href="{% url 'feed' %}" class="nav-item {% if request.resolver_match.url_name == 'feed' %}active{% endif %}">
-              <span class="icon"></span> Feed de Novidades
+              <i data-lucide="newspaper" class="icon"></i> Feed de Novidades
             </a>
             <a href="{% url 'ranking' %}" class="nav-item {% if request.resolver_match.url_name == 'ranking' %}active{% endif %}">
-              <span class="icon">󰨳</span> Ranking Semanal
+              <i data-lucide="trophy" class="icon"></i> Ranking Semanal
             </a>
             <a href="{% url 'livros' %}" class="nav-item {% if request.resolver_match.url_name == 'livros' %}active{% endif %}">
-              <span class="icon"></span> Cadastro de Livros
+              <i data-lucide="book" class="icon"></i> Cadastro de Livros
             </a>
 
             <div class="nav-section-label">Gestão</div>
             <a href="{% url 'editoras' %}" class="nav-item {% if request.resolver_match.url_name == 'editoras' %}active{% endif %}">
-              <span class="icon"></span> Editoras
+              <i data-lucide="building-2" class="icon"></i> Editoras
             </a>
             <a href="{% url 'membros' %}" class="nav-item {% if request.resolver_match.url_name == 'membros' %}active{% endif %}">
-              <span class="icon"></span> Membros
+              <i data-lucide="users" class="icon"></i> Membros
+            </a>
+            <a href="{% url 'reservas' %}" class="nav-item {% if request.resolver_match.url_name == 'reservas' %}active{% endif %}">
+              <i data-lucide="bookmark" class="icon"></i> Reservas
             </a>
             <a href="{% url 'multa' %}" class="nav-item {% if request.resolver_match.url_name == 'multa' %}active{% endif %}">
-              <span class="icon">⊘</span> Calculador de Multa
+              <i data-lucide="calculator" class="icon"></i> Calculador de Multa
             </a>
         {% else %}
             <div class="nav-section-label">Minha Conta</div>
             <a href="{% url 'portal-membro' %}" class="nav-item {% if request.resolver_match.url_name == 'portal-membro' %}active{% endif %}">
-              <span class="icon">󰀉</span> Início / Resumo
+              <i data-lucide="home" class="icon"></i> Início / Resumo
             </a>
         {% endif %}
 
         <div class="nav-section-label">Sistema</div>
         {% if request.user.is_authenticated %}
             <a href="{% url 'portal-logout' %}" class="nav-item">
-              <span class="icon">󰗼</span> Sair da Conta
+              <i data-lucide="log-out" class="icon"></i> Sair da Conta
             </a>
         {% else %}
             <a href="{% url 'portal-login' %}" class="nav-item">
-              <span class="icon">󰗽</span> Entrar
+              <i data-lucide="log-in" class="icon"></i> Entrar
             </a>
         {% endif %}
       </nav>
@@ -72,7 +74,9 @@
       <header class="topbar">
         <h2 class="topbar-title">{% block title %}Painel de Controle{% endblock %}</h2>
         <div class="topbar-right">
+          {% if request.user.is_staff %}
           <a href="{% url 'emprestimo-create' %}" class="btn btn-primary" style="text-decoration: none;">Novo Registro</a>
+          {% endif %}
         </div>
       </header>
 
@@ -93,5 +97,7 @@
 
     <script src="{% static 'script.js' %}"></script>
     {% block extra_js %}{% endblock %}
+    <script src="https://unpkg.com/lucide@0.395.0/dist/umd/lucide.min.js"></script>
+    <script>lucide.createIcons();</script>
   </body>
 </html>

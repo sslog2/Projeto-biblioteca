@@ -19,7 +19,10 @@
         <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar no Portal</button>
     </form>
     <div style="margin-top: 20px; text-align: center;">
-        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; font-size: 14px;">← Voltar ao Sistema Admin</a>
+        <a href="{% url 'portal-cadastro' %}" style="color: #c0392b; text-decoration: none; font-size: 14px; font-weight: 500;">Criar uma conta →</a>
+    </div>
+    <div style="margin-top: 10px; text-align: center;">
+        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; font-size: 13px;">← Voltar ao Sistema Admin</a>
     </div>
 </div>
 {% endblock %}
