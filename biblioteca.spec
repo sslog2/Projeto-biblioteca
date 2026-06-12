@@ -14,10 +14,17 @@ pkg_metadata = (
     copy_metadata('packaging')
 )
 
-# Coleta todos os submódulos automaticamente
-django_hidden = collect_submodules('django')
+# Coleta todos os submódulos automaticamente (exclui GIS — requer GDAL não disponível)
+import os as _os
+django_hidden = [
+    m for m in collect_submodules('django')
+    if not m.startswith('django.contrib.gis')
+]
 drf_hidden = collect_submodules('rest_framework')
 drf_yasg_hidden = collect_submodules('drf_yasg')
+
+# Inclui db.sqlite3 apenas se existir (no CI é gerado via migrate)
+_db_datas = [('db.sqlite3', '.')] if _os.path.exists('db.sqlite3') else []
 
 # Coleta arquivos de dados de pacotes que precisam de templates/statics
 coreschema_datas = collect_data_files('coreschema')
@@ -44,7 +51,7 @@ a = Analysis(
         # Configurações do projeto
         ('project', 'project'),
         # Banco de dados inicial (copiado para AppData na primeira execução)
-        ('db.sqlite3', '.'),
+        *_db_datas,
         # Arquivo .env se existir (ignorado silenciosamente se ausente)
     ],
     hiddenimports=[
