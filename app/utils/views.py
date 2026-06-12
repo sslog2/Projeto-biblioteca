@@ -101,13 +101,22 @@ class PortalLoginView(View):
         return render(request, 'portal_login.html')
 
     def post(self, request):
-        username_or_email = request.POST.get('email')
-        password = request.POST.get('cpf')
+        username_or_email = request.POST.get('email', '').strip()
+        password = request.POST.get('cpf', '').strip()
 
-        # Tenta autenticar diretamente (Django auth para o admin)
+        # 1) Tenta autenticar diretamente pelo username (admin/superuser)
         user = authenticate(request, username=username_or_email, password=password)
-        
-        # Se falhou, tenta buscar pelo email do membro
+
+        # 2) Tenta buscar User pelo email (admin que usou e-mail no campo)
+        if user is None:
+            from django.contrib.auth.models import User as DjangoUser
+            try:
+                django_user = DjangoUser.objects.get(email=username_or_email)
+                user = authenticate(request, username=django_user.username, password=password)
+            except (DjangoUser.DoesNotExist, DjangoUser.MultipleObjectsReturned):
+                pass
+
+        # 3) Tenta buscar pelo email do Membro
         if user is None:
             try:
                 membro = Membro.objects.get(email=username_or_email)
@@ -123,7 +132,7 @@ class PortalLoginView(View):
             return redirect('portal-membro')
         else:
             messages.error(request, "E-mail ou CPF incorretos.")
-        
+
         return render(request, 'portal_login.html')
 
 class PortalLogoutView(View):
